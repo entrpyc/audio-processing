@@ -17,12 +17,20 @@ async function sendAudioToTelegram(filePath, title) {
 }
 
 async function sendDocumentToTelegram(filePath, fileName) {
-  const downloadUrl = `${ROUTE.SERVER_URL}/${ROUTE.DOWNLOADS}/${encodeURIComponent(downloadPath)}`;
-  await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-    chat_id: process.env.TELEGRAM_DOCUMENTS_GROUP_ID,
-    text: `🎧 *${title}*\n[Download Here](${downloadUrl})`,
-    parse_mode: 'Markdown'
-  });
+  fs.copyFileSync(filePath, `${ROUTE.DOWNLOADS}/${fileName}`);
+
+  const downloadUrl = `${ROUTE.SERVER_URL}/${ROUTE.PUBLIC.DOWNLOAD}?file=${encodeURIComponent(fileName)}`;
+
+  const message = `📎 Download: [${fileName}](${downloadUrl})`;
+
+  await axios.post(
+    `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+    {
+      chat_id: process.env.TELEGRAM_DOCUMENTS_GROUP_ID,
+      text: message,
+      parse_mode: 'Markdown'
+    }
+  );
 }
 
 module.exports = {

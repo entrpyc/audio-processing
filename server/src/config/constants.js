@@ -3,6 +3,10 @@ const ROUTE = {
     UPLOADS: 'system/uploads',
     PROCESSED: 'system/processed',
   },
+  PUBLIC: {
+    INDEX: 'public',
+    DOWNLOAD: 'download.html',
+  },
   DOWNLOADS: 'public/downloads',
   SERVER_URL: 'http://wsl:5000',
 }
