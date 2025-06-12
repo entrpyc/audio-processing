@@ -17,7 +17,7 @@ async function sendAudioToTelegram(filePath, title) {
 }
 
 async function sendDocumentToTelegram(filePath, fileName) {
-  fs.copyFileSync(filePath, `${ROUTE.DOWNLOADS}/${fileName}`);
+  fs.copyFileSync(filePath, `${ROUTE.PUBLIC.DOWNLOADS}/${fileName}`);
 
   const downloadUrl = `${ROUTE.SERVER_URL}/${ROUTE.PUBLIC.DOWNLOAD}?file=${encodeURIComponent(fileName)}`;
 

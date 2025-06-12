@@ -13,6 +13,6 @@ app.use(express.json({ limit: `${FILE_SIZE_LIMIT}mb` }));
 app.use(express.urlencoded({ extended: true, limit: `${FILE_SIZE_LIMIT}mb` }));
 
 app.use(express.static(ROUTE.PUBLIC.INDEX));
-app.use('/processAudio', prcoessAudioRoute);
+app.use(ROUTE.PROCESS_AUDIO, prcoessAudioRoute);
 
 app.listen(5000, () => console.log('Server running on port 5000'));

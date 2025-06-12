@@ -1,4 +1,4 @@
-const volumeCompression = [
+const normalizeVolume = [
   'dynaudnorm',
   'volume=2.2',
 ]
@@ -11,5 +11,5 @@ const speechOptimization = [
 
 module.exports = {
   speechOptimization,
-  volumeCompression
+  normalizeVolume
 }

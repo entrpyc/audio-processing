@@ -1,4 +1,5 @@
 const ROUTE = {
+  SERVER_URL: process.env.SERVER_URL,
   SYSTEM: {
     UPLOADS: 'system/uploads',
     PROCESSED: 'system/processed',
@@ -6,9 +7,9 @@ const ROUTE = {
   PUBLIC: {
     INDEX: 'public',
     DOWNLOAD: 'download.html',
+    DOWNLOADS: 'public/downloads',
   },
-  DOWNLOADS: 'public/downloads',
-  SERVER_URL: 'http://wsl:5000',
+  PROCESS_AUDIO: '/process-audio',
 }
 
 const FILE_SIZE_LIMIT = 400;

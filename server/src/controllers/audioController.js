@@ -2,29 +2,31 @@ const ffmpeg = require('fluent-ffmpeg');
 const fs = require('fs');
 const { sendAudioToTelegram, sendDocumentToTelegram } = require('../services/telegramService');
 const { compressBitrate } = require('../utils/audioProcessing');
-const { volumeCompression, speechOptimization } = require('../config/audio');
+const { normalizeVolume, speechOptimization } = require('../config/audio');
 const { getFileData } = require('../utils/formatting');
 const { TELEGRAM_AUDIO_SIZE_LIMIT } = require('../config/constants');
 
 async function audioController(req, res) {
   try {
     const { name: reqName, date: reqDate, sendToTelegram: sendToTelegramFlag } = req.body;
+    console.log(req.body)
     if (!req.file || !reqName || !reqDate) {
       return res.status(400).send('Missing file, name, or date');
     }
 
     const {
       inputPath,
-      fileSize,
       title,
       fileName,
       outputPath
     } = getFileData(req.file, reqName, reqDate);
 
+    if(sendToTelegramFlag === 'true') res.status(200).send('Uploaded! The recording will be posted to Telegram once its ready');
+
     ffmpeg(inputPath)
       .audioBitrate('320k')
       .audioFilters([
-        ...volumeCompression,
+        ...normalizeVolume,
         ...speechOptimization,
       ])
       .on('end', async () => {
@@ -32,7 +34,13 @@ async function audioController(req, res) {
         const compressedFileSize = stats.size / (1024 * 1024);
 
         if(sendToTelegramFlag === 'false') {
-          res.download(outputPath, fileName, () => {
+          console.log(outputPath)
+          console.log(fileName)
+          res.download(outputPath, (err) => {
+            if (err) {
+              return res.status(500).send('Download failed');
+            }
+
             fs.unlinkSync(inputPath);
             fs.unlinkSync(outputPath);
           });
@@ -40,10 +48,8 @@ async function audioController(req, res) {
           try {
             if(compressedFileSize > TELEGRAM_AUDIO_SIZE_LIMIT) await sendDocumentToTelegram(outputPath, fileName);
             else await sendAudioToTelegram(outputPath, title);
-            res.send('Uploaded to Telegram');
           } catch (err) {
             console.error('Telegram upload failed:', err);
-            res.status(500).send('Telegram upload failed');
           } finally {
             fs.unlinkSync(inputPath);
             fs.unlinkSync(outputPath);

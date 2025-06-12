@@ -4,7 +4,7 @@ const path = require('path');
 const { ROUTE } = require('../src/config/constants');
 
 const foldersToClean = [
-  path.join(__dirname, `../${ROUTE.DOWNLOADS}`),
+  path.join(__dirname, `../${ROUTE.PUBLIC.DOWNLOADS}`),
   path.join(__dirname, `../${ROUTE.SYSTEM.PROCESSED}`),
   path.join(__dirname, `../${ROUTE.SYSTEM.UPLOADS}`),
 ];

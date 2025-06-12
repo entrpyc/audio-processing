@@ -19,7 +19,7 @@ function formatDate(inputDate) {
 
 const getFileData = (file, name, date) => {
   const formattedDate = formatDate(date);
-  const formattedName = name.toLowerCase().charAt(0).toUpperCase() + name.toLowerCase().slice(1);
+  const formattedName = name.toLowerCase().charAt(0).toUpperCase() + name.slice(1);
   const title = `${formattedName} - ${formattedDate}`;
   const fileName = `${title}.mp3`;
 
