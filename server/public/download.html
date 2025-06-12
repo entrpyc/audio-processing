@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Downloading...</title>
+  </head>
+  <body>
+    <p>Downloading...</p>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const file = params.get("file");
+
+      if (file) {
+        const a = document.createElement("a");
+        a.href = `/downloads/${encodeURIComponent(file)}`;
+        a.download = file;
+        document.body.appendChild(a);
+        a.click();
+
+        setTimeout(() => {
+          window.close();
+        }, 1000); // Give time for download to trigger
+      } else {
+        document.body.textContent = "No file specified.";
+      }
+    </script>
+  </body>
+</html>
