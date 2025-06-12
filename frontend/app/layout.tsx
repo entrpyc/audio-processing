@@ -3,7 +3,7 @@ import '@mantine/dates/styles.css';
 import { MantineProvider, ColorSchemeScript } from '@mantine/core';
 
 export const metadata = {
-  title: 'Audio Upload',
+  title: 'Audio Processing',
   description: 'App for audio compression, volume normalization, and speech optimization. Send files directly to a Telegram group or channel.',
 };
 
