@@ -1,6 +1,6 @@
 const normalizeVolume = [
   'dynaudnorm',
-  'volume=2.2',
+  'volume=1.6',
 ]
 
 const speechOptimization = [

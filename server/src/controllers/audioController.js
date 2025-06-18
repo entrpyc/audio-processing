@@ -9,7 +9,9 @@ const { TELEGRAM_AUDIO_SIZE_LIMIT } = require('../config/constants');
 async function audioController(req, res) {
   try {
     const { name: reqName, date: reqDate, sendToTelegram: sendToTelegramFlag } = req.body;
+
     console.log(req.body)
+
     if (!req.file || !reqName || !reqDate) {
       return res.status(400).send('Missing file, name, or date');
     }
@@ -18,24 +20,23 @@ async function audioController(req, res) {
       inputPath,
       title,
       fileName,
-      outputPath
+      outputPath,
+      fileSize
     } = getFileData(req.file, reqName, reqDate);
 
     if(sendToTelegramFlag === 'true') res.status(200).send('Uploaded! The recording will be posted to Telegram once its ready');
 
     ffmpeg(inputPath)
-      .audioBitrate('320k')
+      .audioBitrate(compressBitrate(fileSize))
       .audioFilters([
-        ...normalizeVolume,
         ...speechOptimization,
+        ...normalizeVolume,
       ])
       .on('end', async () => {
         const stats = fs.statSync(outputPath);
         const compressedFileSize = stats.size / (1024 * 1024);
 
         if(sendToTelegramFlag === 'false') {
-          console.log(outputPath)
-          console.log(fileName)
           res.download(outputPath, (err) => {
             if (err) {
               return res.status(500).send('Download failed');
