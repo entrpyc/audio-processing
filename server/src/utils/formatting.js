@@ -36,4 +36,5 @@ const getFileData = (file, name, date) => {
 
 module.exports = {
   getFileData,
+  formatDate,
 }
