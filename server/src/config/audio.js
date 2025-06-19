@@ -9,7 +9,13 @@ const speechOptimization = [
   "firequalizer=gain_entry='entry(60, -20);entry(100, -15);entry(150, -10);entry(200, -5)'",
 ]
 
+const defaultAudioFilters = [
+  ...speechOptimization,
+  ...normalizeVolume,
+]
+
 module.exports = {
   speechOptimization,
-  normalizeVolume
+  normalizeVolume,
+  defaultAudioFilters,
 }

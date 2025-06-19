@@ -1,40 +1,8 @@
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
-const { URL } = require('url');
 const { formatDate } = require('../utils/formatting');
 const { ZOOM_RECORDING_FILE_TYPE } = require('../config/constants');
 
 let zoomAccessToken = '';
 let zoomAccessTokenExpiresAt = 0;
-
-async function downloadZoomRecording(url, outputPath) {
-  return new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(outputPath);
-
-    const request = https.get(new URL(url), (response) => {
-      if (response.statusCode !== 200) {
-        file.close();
-        return reject(new Error(`Download failed: ${response.statusCode}`));
-      }
-
-      response.pipe(file);
-
-      file.on('finish', () => {
-        file.close(() => resolve(outputPath));
-      });
-
-      file.on('error', (err) => {
-        fs.unlink(outputPath, () => reject(err));
-      });
-    });
-
-    request.on('error', (err) => {
-      file.close();
-      fs.unlink(outputPath, () => reject(err));
-    });
-  });
-}
 
 const getZoomAccessToken = async () => {
   const now = Date.now();
@@ -94,7 +62,6 @@ const getZoomRecordings = async () => {
 }
 
 module.exports = {
-  downloadZoomRecording,
   getZoomAccessToken,
   getZoomRecordings,
 }
