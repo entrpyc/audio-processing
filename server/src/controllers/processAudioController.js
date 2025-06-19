@@ -6,13 +6,13 @@ const { returnSendingToTelegramStatus } = require('../services/telegramService')
 async function processAudioController(req, res) {
   if(!req?.body) return handleMissingRequestBody(req, res);
 
-  const { title, date, sendToTelegram: sendToTelegramString } = req.body;
-  const validParams = validateRequiredParams(res, { title, date, file: req.file })
+  const { title, date, sendToTelegram: sendToTelegramString, groupId, normalization, bitrate } = req.body;
+  const validParams = validateRequiredParams(res, { title, date, file: req.file, upload: sendToTelegram ? groupId : true })
   if(!validParams) return;
 
   const sendToTelegram = JSON.parse(sendToTelegramString);
 
-  const fileData = createFileData(req.file, title, date);
+  const fileData = createFileData({ file: req.file, groupId, normalization, bitrate, title, date });
 
   if(sendToTelegram) returnSendingToTelegramStatus(res);
 

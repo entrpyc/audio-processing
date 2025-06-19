@@ -28,6 +28,9 @@ const TELEGRAM_SEND_AUDIO_URL = `https://api.telegram.org/bot${process.env.TELEG
 const ZOOM_RECORDINGS_URL = `${process.env.ZOOM_RECORDINGS_URL}?from=2025-01-01`;
 const ZOOM_AUTH_TOKEN_URL = 'https://zoom.us/oauth/token';
 
+const DEFAULT_NORMALIZATION = '1.6';
+const DEFAULT_GROUP_ID = process.env.TELEGRAM_AUDIO_GROUP_ID;
+
 module.exports = {
   ROUTE,
   FILE_SIZE_LIMIT,
@@ -37,4 +40,6 @@ module.exports = {
   TELEGRAM_SEND_AUDIO_URL,
   ZOOM_RECORDINGS_URL,
   ZOOM_AUTH_TOKEN_URL,
+  DEFAULT_NORMALIZATION,
+  DEFAULT_GROUP_ID,
 }

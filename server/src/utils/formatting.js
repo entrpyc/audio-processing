@@ -17,10 +17,17 @@ function formatDate(inputDate) {
   return `${day}${daySuffix} ${month}, ${year}`;
 }
 
-const createFileData = (file, name, date) => {
+const createFileData = ({
+  file,
+  title,
+  date,
+  groupId,
+  normalization,
+  bitrate,
+}) => {
   const formattedDate = formatDate(date);
-  const formattedName = name.toLowerCase().charAt(0).toUpperCase() + name.slice(1);
-  const title = `${formattedName} - ${formattedDate}`;
+  const formattedName = title.toLowerCase().charAt(0).toUpperCase() + title.slice(1);
+  const fullTitle = `${formattedName} - ${formattedDate}`;
   const fileName = `${title}.mp3`;
 
   return {
@@ -28,9 +35,12 @@ const createFileData = (file, name, date) => {
     outputPath: `${ROUTE.SYSTEM.PROCESSED}/${fileName}`,
     fileSize: (file.size / (1024 * 1024)).toFixed(2),
     fileName,
-    title,
+    title: fullTitle,
     date: formattedDate,
     name: formattedName,
+    groupId,
+    normalization,
+    bitrate,
   }
 }
 

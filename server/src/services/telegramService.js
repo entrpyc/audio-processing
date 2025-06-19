@@ -1,11 +1,11 @@
 const axios = require('axios');
 const FormData = require('form-data');
-const { ROUTE, TELEGRAM_SEND_MESSAGE_URL, TELEGRAM_SEND_AUDIO_URL } = require('../config/constants');
+const { ROUTE, TELEGRAM_SEND_MESSAGE_URL, TELEGRAM_SEND_AUDIO_URL, DEFAULT_GROUP_ID } = require('../config/constants');
 const { readAudio, copyFile } = require('../utils/fileSystem');
 
-async function sendAudioToTelegram(filePath, title) {
+async function sendAudioToTelegram(filePath, title, groupId) {
   const form = new FormData();
-  form.append('chat_id', process.env.TELEGRAM_AUDIO_GROUP_ID);
+  form.append('chat_id', groupId || DEFAULT_GROUP_ID);
   form.append('audio', readAudio(filePath));
   form.append('title', title);
 

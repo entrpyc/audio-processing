@@ -8,13 +8,13 @@ const { processAudioAndSendResult } = require('../services/audioService.js');
 async function processZoomRecordingController(req, res) {
   if(!req?.body) return handleMissingRequestBody(req, res);
 
-  const { title, date, downloadUrl, sendToTelegram } = req.body;
-  const validParams = validateRequiredParams(res, { title, date, downloadUrl })
+  const { title, date, downloadUrl, sendToTelegram, groupId, normalization, bitrate } = req.body;
+  const validParams = validateRequiredParams(res, { title, date, downloadUrl, upload: sendToTelegram ? groupId : true })
   if(!validParams) return;
 
   const filePath = await downloadZoomRecording({ downloadUrl });
   const file = readFile(filePath);
-  const fileData = createFileData({ ...file, path: filePath }, title, date);
+  const fileData = createFileData({ file: { ...file, path: filePath }, groupId, normalization, bitrate, title, date });
 
   if(sendToTelegram) returnSendingToTelegramStatus(res);
 
