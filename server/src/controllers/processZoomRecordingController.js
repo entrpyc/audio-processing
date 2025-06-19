@@ -1,49 +1,32 @@
-const fs = require('fs');
-const { getFileData } = require('../utils/formatting');
-const { ROUTE } = require('../config/constants');
-const { Readable } = require('stream');
-const { pipeline } = require('stream/promises');
+const { createFileData } = require('../utils/formatting');
 const { audioProcessor } = require('../services/audioProcessingService.js');
+const { createFile } = require('../utils/fileSystem.js');
+const { downloadZoomRecording } = require('../services/zoomService.js');
+const { validateRequiredParams, handleMissingRequestBody, handleServerError } = require('../utils/errorHandling.js');
+const { returnSendingToTelegramStatus } = require('../services/telegramService.js');
 
 async function processZoomRecordingController(req, res) {
   try {
-    const {
-      title: reqTitle,
-      date: reqDate,
-      downloadUrl: downloadUrl,
-      sendToTelegram: sendToTelegramFlag,
-    } = req.body;
+    if(!req?.body) return handleMissingRequestBody(req, res);
 
-    if (!reqTitle || !reqDate || !downloadUrl) {
-      return res.status(400).json({ error: 'Missing title, date, or downloadUrl' });
-    }
+    const { title, date, downloadUrl, sendToTelegram } = req.body;
+    const validParams = validateRequiredParams(res, { title, date, downloadUrl })
+    if(!validParams) return;
 
-    const uploadPath = `${ROUTE.SYSTEM.UPLOADS}/input_${Date.now()}.m4a`;
-    const response = await fetch(downloadUrl);
-    const nodeStream = Readable.fromWeb(response.body);
+    const filePath = await downloadZoomRecording({ downloadUrl });
+    const file = createFile(filePath);
+    const fileData = createFileData({ ...file, path: filePath }, title, date);
 
-    await pipeline(
-      nodeStream,
-      fs.createWriteStream(uploadPath)
-    );
-
-    const fileStats = fs.statSync(uploadPath);
-
-    const fileData = getFileData({ ...fileStats, path: uploadPath }, reqTitle, reqDate);
-
-    if(sendToTelegramFlag) res.status(200).json({
-      status: 'Uploaded! The recording will be posted to Telegram once its ready'
-    });
+    if(sendToTelegram) returnSendingToTelegramStatus(res);
 
     audioProcessor({
       fileData,
       res,
-      sendToTelegramFlag,
+      sendToTelegram,
     });
 
-  } catch (err) {
-    console.error('Server error:', err);
-    res.status(500).json({ error: 'Server crashed' });
+  } catch (error) {
+    handleServerError({ res, error });
   }
 }
 

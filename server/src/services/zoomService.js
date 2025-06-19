@@ -1,5 +1,8 @@
+const fs = require('fs');
 const { formatDate } = require('../utils/formatting');
-const { ZOOM_RECORDING_FILE_TYPE } = require('../config/constants');
+const { ZOOM_RECORDING_FILE_TYPE, ROUTE } = require('../config/constants');
+const { Readable } = require('stream');
+const { pipeline } = require('stream/promises');
 
 let zoomAccessToken = '';
 let zoomAccessTokenExpiresAt = 0;
@@ -8,7 +11,7 @@ const getZoomAccessToken = async () => {
   const now = Date.now();
 
   if (zoomAccessToken && now < zoomAccessTokenExpiresAt) {
-    return zoomAccessToken; // Use cached token
+    return zoomAccessToken;
   }
 
   const res = await fetch('https://zoom.us/oauth/token', {
@@ -61,7 +64,21 @@ const getZoomRecordings = async () => {
   return mappedRecordings;
 }
 
+const downloadZoomRecording = async ({ downloadUrl }) => {
+  const filePath = `${ROUTE.SYSTEM.UPLOADS}/input_${Date.now()}.m4a`;
+  const response = await fetch(downloadUrl);
+  const nodeStream = Readable.fromWeb(response.body);
+
+  await pipeline(
+    nodeStream,
+    fs.createWriteStream(filePath)
+  );
+
+  return filePath;
+}
+
 module.exports = {
   getZoomAccessToken,
   getZoomRecordings,
+  downloadZoomRecording,
 }

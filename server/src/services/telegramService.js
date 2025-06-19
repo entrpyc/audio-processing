@@ -32,7 +32,14 @@ async function sendDocumentToTelegram(filePath, fileName) {
   );
 }
 
+const returnSendingToTelegramStatus = (res) => {
+  res.status(200).json({
+    status: 'Uploaded! The recording will be posted to Telegram once its ready'
+  });
+}
+
 module.exports = {
   sendAudioToTelegram,
-  sendDocumentToTelegram
+  sendDocumentToTelegram,
+  returnSendingToTelegramStatus
 };
