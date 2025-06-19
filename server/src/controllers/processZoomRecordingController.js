@@ -39,7 +39,8 @@ async function processZoomRecordingController(req, res) {
       inputPath,
       title,
       fileName,
-      outputPath
+      outputPath,
+      fileSize
     } = getFileData({ ...fileStats, path: uploadPath }, reqTitle, reqDate);
 
     if(sendToTelegramFlag) res.status(200).json({

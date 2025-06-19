@@ -35,7 +35,8 @@ async function processAudioController(req, res) {
       inputPath,
       title,
       fileName,
-      outputPath
+      outputPath,
+      fileSize
     } = getFileData({ ...fileStats, path: tempInputPath }, reqTitle, reqDate);
 
     if(sendToTelegramFlag === 'true') res.status(200).json({
@@ -43,10 +44,10 @@ async function processAudioController(req, res) {
     });
 
     ffmpeg(inputPath)
-      .audioBitrate('64k')
+      .audioBitrate(compressBitrate(fileSize))
       .audioFilters([
-        ...normalizeVolume,
         ...speechOptimization,
+        ...normalizeVolume,
       ])
       .on('end', async () => {
         const stats = fs.statSync(outputPath);
