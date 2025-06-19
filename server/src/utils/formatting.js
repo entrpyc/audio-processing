@@ -34,7 +34,12 @@ const createFileData = (file, name, date) => {
   }
 }
 
+const parseBitsToMB = (bits) => bits * 1024 * 1024;
+const parseMBtoBits = (bits) => bits / (1024 * 1024);
+
 module.exports = {
   createFileData,
   formatDate,
+  parseBitsToMB,
+  parseMBtoBits,
 }

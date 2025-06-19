@@ -1,28 +1,22 @@
 const { createFileData } = require('../utils/formatting');
-const { audioProcessor } = require('../services/audioProcessingService');
-const { handleServerError, handleMissingRequestBody } = require('../utils/errorHandling');
+const { handleMissingRequestBody, validateRequiredParams } = require('../utils/errorHandling');
+const { processAudioAndSendResult } = require('../services/audioService');
+const { returnSendingToTelegramStatus } = require('../services/telegramService');
 
 async function processAudioController(req, res) {
-  try {
-    if(!req?.body) return handleMissingRequestBody(req, res);
+  if(!req?.body) return handleMissingRequestBody(req, res);
 
-    const { title, date, sendToTelegram } = req.body;
-    const validParams = validateRequiredParams(res, { title, date, file: req.file })
-    if(!validParams) return;
+  const { title, date, sendToTelegram: sendToTelegramString } = req.body;
+  const validParams = validateRequiredParams(res, { title, date, file: req.file })
+  if(!validParams) return;
 
-    const fileData = createFileData(req.file, title, date);
+  const sendToTelegram = JSON.parse(sendToTelegramString);
 
-    if(sendToTelegram) returnSendingToTelegramStatus(res);
+  const fileData = createFileData(req.file, title, date);
 
-    audioProcessor({
-      fileData,
-      res,
-      sendToTelegram,
-    });
-  
-  } catch (error) {
-    handleServerError({ res, error });
-  }
+  if(sendToTelegram) returnSendingToTelegramStatus(res);
+
+  processAudioAndSendResult({ fileData, sendToTelegram, res });
 }
 
 module.exports = {

@@ -1,8 +1,8 @@
-const fs = require('fs');
 const { formatDate } = require('../utils/formatting');
-const { ZOOM_RECORDING_FILE_TYPE, ROUTE } = require('../config/constants');
+const { ZOOM_RECORDING_FILE_TYPE, ROUTE, ZOOM_RECORDINGS_URL, ZOOM_AUTH_TOKEN_URL } = require('../config/constants');
 const { Readable } = require('stream');
 const { pipeline } = require('stream/promises');
+const { writeAudio } = require('../utils/fileSystem');
 
 let zoomAccessToken = '';
 let zoomAccessTokenExpiresAt = 0;
@@ -14,7 +14,7 @@ const getZoomAccessToken = async () => {
     return zoomAccessToken;
   }
 
-  const res = await fetch('https://zoom.us/oauth/token', {
+  const res = await fetch(ZOOM_AUTH_TOKEN_URL, {
     method: 'POST',
     headers: {
       Authorization: `Basic ${Buffer.from(`${process.env.ZOOM_CLIENT_ID}:${process.env.ZOOM_CLIENT_SECRET}`).toString('base64')}`,
@@ -39,7 +39,7 @@ const getZoomAccessToken = async () => {
 const getZoomRecordings = async () => {
   const zoomAcessToken = await getZoomAccessToken();
 
-  const response = await fetch(`${process.env.ZOOM_RECORDINGS_URL}?from=2025-01-01`, {
+  const response = await fetch(ZOOM_RECORDINGS_URL, {
     headers: {
       Authorization: `Bearer ${zoomAcessToken}`,
       'Content-Type': 'application/json',
@@ -65,13 +65,13 @@ const getZoomRecordings = async () => {
 }
 
 const downloadZoomRecording = async ({ downloadUrl }) => {
-  const filePath = `${ROUTE.SYSTEM.UPLOADS}/input_${Date.now()}.m4a`;
+  const filePath = `${ROUTE.SYSTEM.UPLOADS}/zoom_recording_${Date.now()}.m4a`;
   const response = await fetch(downloadUrl);
   const nodeStream = Readable.fromWeb(response.body);
 
   await pipeline(
     nodeStream,
-    fs.createWriteStream(filePath)
+    writeAudio(filePath)
   );
 
   return filePath;

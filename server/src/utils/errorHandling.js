@@ -1,6 +1,6 @@
 const handleServerError = ({ res, error }) => {
-  console.error('Server error:', error);
-  res.status(500).json({ error: 'Server crashed' });
+  console.error('Unhandled error:', error);
+  res.status(500).json({ error: 'Internal server error' });
 }
 
 const handleMissingRequestBody = (res) => {
@@ -18,8 +18,19 @@ const validateRequiredParams = (res, params) => {
   return true;
 }
 
+const handleRouteErrors = (fn) => {
+  if (typeof fn !== 'function') {
+    throw new TypeError(`Expected function, got ${typeof fn}`);
+  }
+
+  return function (req, res, next) {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
+}
+
 module.exports = {
   handleServerError,
   handleMissingRequestBody,
   validateRequiredParams,
+  handleRouteErrors,
 }

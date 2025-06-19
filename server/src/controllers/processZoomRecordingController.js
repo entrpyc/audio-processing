@@ -1,33 +1,24 @@
 const { createFileData } = require('../utils/formatting');
-const { audioProcessor } = require('../services/audioProcessingService.js');
-const { createFile } = require('../utils/fileSystem.js');
+const { readFile } = require('../utils/fileSystem.js');
 const { downloadZoomRecording } = require('../services/zoomService.js');
-const { validateRequiredParams, handleMissingRequestBody, handleServerError } = require('../utils/errorHandling.js');
+const { validateRequiredParams, handleMissingRequestBody } = require('../utils/errorHandling.js');
 const { returnSendingToTelegramStatus } = require('../services/telegramService.js');
+const { processAudioAndSendResult } = require('../services/audioService.js');
 
 async function processZoomRecordingController(req, res) {
-  try {
-    if(!req?.body) return handleMissingRequestBody(req, res);
+  if(!req?.body) return handleMissingRequestBody(req, res);
 
-    const { title, date, downloadUrl, sendToTelegram } = req.body;
-    const validParams = validateRequiredParams(res, { title, date, downloadUrl })
-    if(!validParams) return;
+  const { title, date, downloadUrl, sendToTelegram } = req.body;
+  const validParams = validateRequiredParams(res, { title, date, downloadUrl })
+  if(!validParams) return;
 
-    const filePath = await downloadZoomRecording({ downloadUrl });
-    const file = createFile(filePath);
-    const fileData = createFileData({ ...file, path: filePath }, title, date);
+  const filePath = await downloadZoomRecording({ downloadUrl });
+  const file = readFile(filePath);
+  const fileData = createFileData({ ...file, path: filePath }, title, date);
 
-    if(sendToTelegram) returnSendingToTelegramStatus(res);
+  if(sendToTelegram) returnSendingToTelegramStatus(res);
 
-    audioProcessor({
-      fileData,
-      res,
-      sendToTelegram,
-    });
-
-  } catch (error) {
-    handleServerError({ res, error });
-  }
+  processAudioAndSendResult({ fileData, sendToTelegram, res });
 }
 
 module.exports = {

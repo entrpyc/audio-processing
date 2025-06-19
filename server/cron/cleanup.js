@@ -9,7 +9,7 @@ const foldersToClean = [
   path.join(__dirname, `../${ROUTE.SYSTEM.UPLOADS}`),
 ];
 
-function clearFolder(folderPath) {
+const clearFolder = (folderPath) => {
   fs.readdir(folderPath, (err, files) => {
     if (err) return console.error(`[CLEANUP] Failed to read ${folderPath}:`, err);
     for (const file of files) {
@@ -21,8 +21,16 @@ function clearFolder(folderPath) {
   });
 }
 
+const cleanTempFiles = () => {
+  foldersToClean.forEach(clearFolder);
+}
+
 // Every Monday at 00:00
 cron.schedule('0 0 * * 1', () => {
   console.log('[CLEANUP] Weekly cleanup started...');
   foldersToClean.forEach(clearFolder);
 });
+
+module.exports = {
+  cleanTempFiles
+}
