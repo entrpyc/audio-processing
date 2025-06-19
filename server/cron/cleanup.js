@@ -1,7 +1,7 @@
 const cron = require('node-cron');
-const fs = require('fs');
 const path = require('path');
 const { ROUTE } = require('../src/config/constants');
+const { openFolder, deleteFileAsync } = require('../src/utils/fileSystem');
 
 const foldersToClean = [
   path.join(__dirname, `../${ROUTE.PUBLIC.DOWNLOADS}`),
@@ -10,11 +10,11 @@ const foldersToClean = [
 ];
 
 const clearFolder = (folderPath) => {
-  fs.readdir(folderPath, (err, files) => {
+  openFolder(folderPath, (err, files) => {
     if (err) return console.error(`[CLEANUP] Failed to read ${folderPath}:`, err);
     for (const file of files) {
       const fullPath = path.join(folderPath, file);
-      fs.unlink(fullPath, err => {
+      deleteFileAsync(fullPath, err => {
         if (err) console.error(`[CLEANUP] Failed to delete ${fullPath}:`, err);
       });
     }

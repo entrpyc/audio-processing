@@ -30,6 +30,14 @@ const createFolder = (path) => {
   fs.mkdirSync(path, { recursive: true })
 }
 
+const openFolder = (path, cb) => {
+  fs.readdir(path, cb)
+}
+
+const deleteFileAsync = (path, cb) => {
+  fs.unlink(path, cb)
+}
+
 module.exports = {
   readFile,
   deleteFile,
@@ -38,4 +46,6 @@ module.exports = {
   copyFile,
   findFolder,
   createFolder,
+  openFolder,
+  deleteFileAsync,
 }
