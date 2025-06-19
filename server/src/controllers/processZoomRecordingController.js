@@ -47,10 +47,10 @@ async function processZoomRecordingController(req, res) {
     });
 
     ffmpeg(inputPath)
-      .audioBitrate('64k')
+      .audioBitrate(compressBitrate(fileSize))
       .audioFilters([
-        ...normalizeVolume,
         ...speechOptimization,
+        ...normalizeVolume,
       ])
       .on('end', async () => {
         const stats = fs.statSync(outputPath);
