@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const ROUTE = {
-  SERVER_URL: process.env.SERVER_URL,
+  SERVER_URL: process.env.PUBLIC_SERVER_URL,
   SYSTEM: {
     UPLOADS: 'system/uploads',
     PROCESSED: 'system/processed',

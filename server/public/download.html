@@ -12,14 +12,10 @@
 
       if (file) {
         const a = document.createElement("a");
-        a.href = `/downloads/${encodeURIComponent(file)}`;
+        a.href = `https://audio-processing.indepthwebsolutions.com/api/downloads/${encodeURIComponent(file)}`;
         a.download = file;
         document.body.appendChild(a);
         a.click();
-
-        setTimeout(() => {
-          window.close();
-        }, 1000); // Give time for download to trigger
       } else {
         document.body.textContent = "No file specified.";
       }

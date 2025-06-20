@@ -17,7 +17,7 @@ const app = express();
 setupServerFolders();
 cleanTempFiles();
 
-app.use(cors());
+app.use(cors({ origin: '*' }));
 app.use(express.json({ limit: `${FILE_SIZE_LIMIT}mb` }));
 app.use(express.urlencoded({ extended: true, limit: `${FILE_SIZE_LIMIT}mb` }));
 
