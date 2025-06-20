@@ -1,6 +1,9 @@
 import '@mantine/core/styles.css'; 
 import '@mantine/dates/styles.css';
-import { MantineProvider, ColorSchemeScript } from '@mantine/core';
+import '@mantine/notifications/styles.css';
+
+import { MantineProvider } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
 
 export const metadata = {
   title: 'Audio Processing',
@@ -10,9 +13,6 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        <ColorSchemeScript defaultColorScheme="auto" />
-      </head>
       <body>
         <MantineProvider
           defaultColorScheme="auto"
@@ -21,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             defaultRadius: 'sm',
           }}
         >
+            <Notifications />
           {children}
         </MantineProvider>
       </body>
