@@ -24,6 +24,7 @@ const createFileData = ({
   groupId,
   normalization,
   bitrate,
+  applyFilters,
 }) => {
   const formattedDate = formatDate(date);
   const formattedName = title.toLowerCase().charAt(0).toUpperCase() + title.slice(1);
@@ -41,6 +42,7 @@ const createFileData = ({
     groupId,
     normalization,
     bitrate,
+    applyFilters: JSON.parse(applyFilters ?? 'true'),
   }
 }
 

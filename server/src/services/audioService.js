@@ -29,13 +29,14 @@ const handleSendAudioResult = async ({
 }
 
 const processAudioAndSendResult = async ({ fileData, sendToTelegram, res }) => {
-  const { inputPath, outputPath, fileSize, bitrate, normalization } = fileData;
+  const { inputPath, outputPath, fileSize, bitrate, normalization, applyFilters } = fileData;
 
   await processAudio({
     inputPath,
     outputPath,
-    bitrate: bitrate || compressBitrate(fileSize),
-    filters: getFilters({ normalization })
+    bitrate: applyFilters ? bitrate || compressBitrate(fileSize) : '196k',
+    filters: getFilters({ normalization }),
+    applyFilters
   });
 
   handleSendAudioResult({

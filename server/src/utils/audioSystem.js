@@ -5,10 +5,11 @@ const processAudio = ({
   outputPath,
   bitrate,
   filters,
+  applyFilters
 }) => new Promise((resolve, reject) => {
   ffmpeg(inputPath)
     .audioBitrate(bitrate)
-    .audioFilters(filters)
+    .audioFilters(applyFilters ? filters : [])
     .on('end', () => {
       resolve();
     })
