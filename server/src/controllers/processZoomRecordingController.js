@@ -12,11 +12,12 @@ async function processZoomRecordingController(req, res) {
   const validParams = validateRequiredParams(res, { title, date, downloadUrl, upload: sendToTelegram ? groupId : true })
   if(!validParams) return;
 
-  if(sendToTelegram) returnSendingToTelegramStatus(res);
-
+  
   const filePath = await downloadZoomRecording({ downloadUrl });
   const file = readFile(filePath);
   const fileData = createFileData({ file: { ...file, path: filePath }, groupId, normalization, bitrate, title, date, applyFilters });
+  
+  if(sendToTelegram) returnSendingToTelegramStatus(res);
 
   processAudioAndSendResult({ fileData, sendToTelegram, res });
 }
