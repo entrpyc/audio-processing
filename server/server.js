@@ -22,13 +22,17 @@ app.use(express.json({ limit: `${FILE_SIZE_LIMIT}mb` }));
 app.use(express.urlencoded({ extended: true, limit: `${FILE_SIZE_LIMIT}mb` }));
 
 app.use(express.static(ROUTE.PUBLIC.INDEX));
-app.get(ROUTE.HEALTH, (req, res) => res.status(200).json({ status: 'OK' }));
+app.get(ROUTE.HEALTH, (req, res) => {
+  console.log('res', 'OK')
+  res.status(200).json({ status: 'OK' })
+});
 
 app.use(ROUTE.PROCESS_AUDIO, handleRouteErrors(processAudioRoute));
 app.use(ROUTE.PROCESS_ZOOM_RECORDING, handleRouteErrors(processZoomRecordingRoute));
 app.use(ROUTE.RECORDINGS, handleRouteErrors(recordingsRoute));
 
 app.use((req, res) => {
+  console.log('res', 'Route not found')
   res.status(404).json({ error: 'Route not found' });
 });
 

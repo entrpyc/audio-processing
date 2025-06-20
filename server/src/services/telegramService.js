@@ -34,6 +34,7 @@ async function sendDocumentToTelegram(filePath, fileName) {
 }
 
 const returnSendingToTelegramStatus = (res) => {
+  console.log('res', 'Uploaded! The recording will be posted to Telegram once its processed')
   res.status(200).json({
     status: 'Uploaded! The recording will be posted to Telegram once its processed'
   });

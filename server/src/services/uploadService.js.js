@@ -17,9 +17,11 @@ const uploadToTelegram = async ({
 }
 
 const downloadFile = ({ outputPath, res }) => new Promise((resolve, reject) => {
+  console.log('res', 'download')
   res.download(outputPath, (err) => {
     if (err) {
       console.error(err);
+      console.log('res', 'Download failed')
       res.status(500).json({ error: 'Download failed' });
       return reject(err);
     }
