@@ -2,6 +2,8 @@ const { getZoomRecordings } = require('../services/zoomService');
 
 async function recordingsController(req, res) {
   if(!req?.body) return handleMissingRequestBody(req, res);
+  console.log('recordingsController', JSON.parse(req?.body))
+
   const { zoomToken } = req.body;
 
   const validParams = validateRequiredParams(res, { zoomToken })
