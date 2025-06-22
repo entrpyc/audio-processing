@@ -14,6 +14,7 @@ const ROUTE = {
   PROCESS_AUDIO: '/process-audio',
   PROCESS_ZOOM_RECORDING: '/process-zoom-recording',
   RECORDINGS: '/recordings',
+  ZOOM_TOKEN: '/zoom-token',
   HEALTH: '/health',
 }
 

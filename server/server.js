@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 const processAudioRoute = require('./src/routes/processAudioRoute');
+const zoomTokenRoute = require('./src/routes/zoomTokenRoute');
 const processZoomRecordingRoute = require('./src/routes/processZoomRecordingRoute');
 const recordingsRoute = require('./src/routes/recordingsRoute');
 const { FILE_SIZE_LIMIT, ROUTE } = require('./src/config/constants');
@@ -30,6 +31,7 @@ app.get(ROUTE.HEALTH, (req, res) => {
 app.use(ROUTE.PROCESS_AUDIO, handleRouteErrors(processAudioRoute));
 app.use(ROUTE.PROCESS_ZOOM_RECORDING, handleRouteErrors(processZoomRecordingRoute));
 app.use(ROUTE.RECORDINGS, handleRouteErrors(recordingsRoute));
+app.use(ROUTE.ZOOM_TOKEN, handleRouteErrors(zoomTokenRoute));
 
 app.use((req, res) => {
   console.log('res', 'Route not found')

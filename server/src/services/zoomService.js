@@ -4,16 +4,7 @@ const { Readable } = require('stream');
 const { pipeline } = require('stream/promises');
 const { writeAudio } = require('../utils/fileSystem');
 
-let zoomAccessToken = '';
-let zoomAccessTokenExpiresAt = 0;
-
 const getZoomAccessToken = async () => {
-  const now = Date.now();
-
-  if (zoomAccessToken && now < zoomAccessTokenExpiresAt) {
-    return zoomAccessToken;
-  }
-
   const res = await fetch(ZOOM_AUTH_TOKEN_URL, {
     method: 'POST',
     headers: {
@@ -30,15 +21,10 @@ const getZoomAccessToken = async () => {
 
   if (!res.ok) throw new Error(data.reason || 'Failed to fetch token');
 
-  zoomAccessToken = data.access_token;
-  zoomAccessTokenExpiresAt = Date.now() + data.expires_in * 1000 - 10_000;
-
-  return zoomAccessToken;
+  return data.access_token;
 };
 
-const getZoomRecordings = async () => {
-  const zoomAcessToken = await getZoomAccessToken();
-
+const getZoomRecordings = async ({ zoomAcessToken }) => {
   const response = await fetch(ZOOM_RECORDINGS_URL, {
     headers: {
       Authorization: `Bearer ${zoomAcessToken}`,
