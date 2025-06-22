@@ -4,20 +4,48 @@ import { Container, SegmentedControl, Stack, Title } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import AdvancedForm from './components/AdvancedForm';
 import { ZoomRecording } from './types/types';
+import QuickForm from './components/QuickForm';
 
 export default function Home() {
-  const [value, setValue] = useState('advanced');
+  const [value, setValue] = useState('quick');
+  const [zoomToken, setZoomToken] = useState<string>();
   const [recordings, setRecordings] = useState<ZoomRecording[]>([]);
+
+useEffect(() => {
+  const fetchToken = async () => {
+    const res = await fetch('https://audio-processing.indepthwebsolutions.com/api/zoom-token');
+    const data = await res.json();
+    
+    if (!data.error) {
+      setZoomToken(data.zoomToken);
+    }
+  };
+
+  fetchToken();
+
+  const interval = setInterval(fetchToken, 10 * 60 * 1000);
+
+  return () => clearInterval(interval);
+}, []);
 
   useEffect(() => {
     const fetchRecordings = async () => {
-      const res = await fetch('https://audio-processing.indepthwebsolutions.com/api/recordings');
-      const data = await res.json() as ZoomRecording[];
-      setRecordings(data.filter(rec => Boolean(rec.downloadUrl)));
+      const res = await fetch('https://audio-processing.indepthwebsolutions.com/api/recordings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ zoomToken }),
+      });
+      const data = await res.json();
+      
+      if(data.error) return;
+
+      setRecordings(data.recordings?.filter((rec: ZoomRecording) => Boolean(rec.downloadUrl)) || []);
     }
 
-    fetchRecordings();
-  }, [])
+    if(zoomToken) fetchRecordings();
+  }, [zoomToken])
 
   return (
     <main>
@@ -36,13 +64,9 @@ export default function Home() {
             ]}
           />
           {value === 'quick' ? (
-            <>
-              <p>Title</p>
-              <p>Cloud select</p>
-              <p>Send to Group</p>
-            </>
+            <QuickForm recordings={recordings} zoomToken={zoomToken} />
           ): (
-            <AdvancedForm recordings={recordings} />
+            <AdvancedForm recordings={recordings} zoomToken={zoomToken} />
           )}
         </Stack>
       </Container>
