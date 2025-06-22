@@ -49,7 +49,7 @@ const APP_STATES = {
   COMPLETED: 'completed',
 }
 
-export default function AdvancedForm({ recordings, zoomToken }: { recordings: ZoomRecording[], zoomToken: string | undefined }) {
+export default function QuickForm({ recordings, zoomToken }: { recordings: ZoomRecording[], zoomToken: string | undefined }) {
   const [status, setStatus] = useState('');
   const [source, setSource] = useState('zoom-cloud');
   const [selectedRecording, setSelectedRecording] = useState<ZoomRecording>();
@@ -200,21 +200,25 @@ export default function AdvancedForm({ recordings, zoomToken }: { recordings: Zo
     >
       <Stack gap={40}>
         <Paper shadow="md" withBorder p={20}>
+          <Stack gap={30}>
+            <Title order={2}>Recording Info</Title>
+            <Stack gap={10}>
+              <TextInput
+                disabled={appState !== APP_STATES.INIT}
+                label="Title"
+                ref={fieldRefs.title}
+                placeholder="What should be the title of this meeting?"
+                withAsterisk
+                {...form.getInputProps('title')}
+              />
+            </Stack>
+          </Stack>
+        </Paper>
+        
+        <Paper shadow="md" withBorder p={20}>
           <Stack gap={30} ref={fieldRefs.audioFile}>
             <Title order={2}>Source</Title>
-            <SegmentedControl
-              disabled={appState !== APP_STATES.INIT}
-              fullWidth
-              size="md"
-              value={source}
-              onChange={setSource}
-              data={[
-                { label: '☁︎ Zoom Cloud', value: 'zoom-cloud' },
-                { label: '📁 Upload', value: 'upload' },
-              ]}
-            />
-            {source === 'zoom-cloud' ? (
-              !recordings.length ? (
+            {!recordings.length ? (
                 <Flex justify="center" align="center">
                   <Loader color="blue" />
                 </Flex>
@@ -234,142 +238,27 @@ export default function AdvancedForm({ recordings, zoomToken }: { recordings: Zo
                     </Card>
                   ))}
                 </Stack>
-              )
-            ) : (
-              <FileInput
-                disabled={appState !== APP_STATES.INIT}
-                label="Audio File"
-                placeholder="Select a file"
-                withAsterisk
-                accept="audio/*"
-                {...form.getInputProps('audioFile')}
-              />
-            )}
-          </Stack>
-        </Paper>
-
-        <Paper shadow="md" withBorder p={20}>
-          <Stack gap={30}>
-            <Title order={2}>Recording Info</Title>
-            <Stack gap={10}>
-              <TextInput
-                disabled={appState !== APP_STATES.INIT}
-                label="Title"
-                ref={fieldRefs.title}
-                placeholder="What should be the title of this meeting?"
-                withAsterisk
-                {...form.getInputProps('title')}
-              />
-              {source === 'upload' && (
-                <DateInput
-                  disabled={appState !== APP_STATES.INIT}
-                  label="Date"
-                  ref={fieldRefs.date}
-                  placeholder="When was this meeting recorded?"
-                  withAsterisk
-                  valueFormat="YYYY-MM-DD"
-                  {...form.getInputProps('date')}
-                />
               )}
-            </Stack>
           </Stack>
-        </Paper>
+        </Paper>        
 
         <Paper shadow="md" withBorder p={20}>
           <Stack gap={30}>
             <Title order={2}>Output</Title>
             <Stack gap={20}>
-              <SegmentedControl
+              <Select
                 disabled={appState !== APP_STATES.INIT}
-                value={output}
-                onChange={setOutput}
-                data={[
-                  { label: 'Send to Telegram', value: 'telegram' },
-                  { label: 'Download', value: 'download' },
-                ]}
-              /> 
-              {output === 'telegram' ? (
-                <Select
-                  disabled={appState !== APP_STATES.INIT}
-                  label="Select a Telegram group"
-                  placeholder="Pick one"
-                  data={telegramGroups}
-                  value={group}
-                  onChange={handleGroupClick}
-                />
-              ) : (
-                <Text>The recording will be downloaded after its processed.</Text>
-              )}
-            </Stack>
-          </Stack>
-        </Paper>
-
-        <Paper shadow="md" withBorder p={20} pb={40}>
-          <Stack gap={30}>
-            <Title order={2}>Audio Filters</Title>
-            <Stack gap={30}>
-              <SegmentedControl
-                disabled={appState !== APP_STATES.INIT}
-                value={filters}
-                onChange={setFilters}
-                data={[
-                  { label: 'Use default settings', value: 'default' },
-                  { label: 'No filters', value: 'no-filters' },
-                  { label: 'Use custom settings', value: 'custom' },
-                ]}
+                label="Select a Telegram group"
+                placeholder="Pick one"
+                data={telegramGroups}
+                value={group}
+                onChange={handleGroupClick}
               />
-              {filters === 'default' && (
-                <Text>The default audio filters will be applied.</Text>
-              )}
-              {filters === 'no-filters' && (
-                <Text>No filters will be applied.</Text>
-              )}
-              {filters === 'custom' && (
-                <Stack gap={40}>
-                  <Stack>
-                    <Text size="sm">Volume boost</Text>
-                    <Slider
-                      disabled={appState !== APP_STATES.INIT}
-                      size="lg"
-                      value={volumeBoost}
-                      onChange={setVolumeBoost}
-                      defaultValue={1.6}
-                      min={1.0}
-                      max={3.0}
-                      step={0.1}
-                      marks={[
-                        { value: 0, label: '1.0' },
-                        { value: 100, label: '3.0' },
-                      ]}
-                    />
-                  </Stack>
-                  <Stack>
-                    <Text size="sm">Bitrate</Text>
-                    <Slider
-                      disabled={appState !== APP_STATES.INIT}
-                      size="lg"
-                      value={bitrate}
-                      onChange={setBitrate}
-                      defaultValue={50}
-                      label={(val) => bitrateOptions.find((opt) => opt.value === val)!.label}
-                      step={25}
-                      marks={bitrateOptions}
-                    />
-                  </Stack>
-                </Stack>
-              )}
             </Stack>
           </Stack>
         </Paper>
 
-        <Paper shadow="md" withBorder p={20}>
-          <Title order={2} mb="sm">Confirm and Upload</Title>
-          <Text><strong>Title:</strong> {form.getValues().title || '-'}</Text>
-          <Text><strong>Date:</strong> {source === 'zoom-cloud' && !selectedRecording?.date ? '-' : selectedDate ? formatDate(selectedDate) : '-'}</Text>
-          <Text><strong>Source:</strong> {source === 'zoom-cloud' ? `Cloud recording from ${selectedRecording?.date ?? '-'}` : `Uploaded file "${form.getValues().audioFile?.name || '-'}"`}</Text>
-          <Text><strong>Output:</strong> {output === 'download' ? 'Download to this device' : telegramGroups.find(g => g.value === group)?.label}</Text>
-          <Text><strong>Filters:</strong> {(filters === 'default' && 'Default filters') || (filters === 'no-filters' && 'No filters') || `Volume boost - ${volumeBoost}, Bitrate - ${bitrateOptions.find(v => v.value === bitrate)?.label}`}</Text>
-          <Divider my={20} />
+        <Flex>
           {appState === APP_STATES.INIT && (
             <Button type="submit" fullWidth disabled={!zoomToken}>Submit</Button>
           )}
@@ -383,7 +272,7 @@ export default function AdvancedForm({ recordings, zoomToken }: { recordings: Zo
               {appErrorState ? '❌ There was an error. Try again?' : '✅ Completed! Start a new submission?'}
             </Button>
           )}
-        </Paper>
+        </Flex>
       </Stack>
     </form>
   );
