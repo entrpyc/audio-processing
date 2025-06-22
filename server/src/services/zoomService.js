@@ -24,10 +24,10 @@ const getZoomAccessToken = async () => {
   return data.access_token;
 };
 
-const getZoomRecordings = async ({ zoomAcessToken }) => {
+const getZoomRecordings = async ({ zoomToken }) => {
   const response = await fetch(ZOOM_RECORDINGS_URL, {
     headers: {
-      Authorization: `Bearer ${zoomAcessToken}`,
+      Authorization: `Bearer ${zoomToken}`,
       'Content-Type': 'application/json',
     }
   })
@@ -50,19 +50,21 @@ const getZoomRecordings = async ({ zoomAcessToken }) => {
   return mappedRecordings;
 }
 
-const downloadZoomRecording = async ({ downloadUrl }) => {
+const downloadZoomRecording = async ({ downloadUrl, zoomToken }) => {
   const filePath = `${ROUTE.SYSTEM.UPLOADS}/zoom_recording_${Date.now()}.m4a`;
-  const response = await fetch(downloadUrl);
+
+  const response = await fetch(downloadUrl, {
+    headers: {
+      Authorization: `Bearer ${zoomToken}`,
+    },
+  });
+
   const nodeStream = Readable.fromWeb(response.body);
 
-  await pipeline(
-    nodeStream,
-    writeAudio(filePath)
-  );
+  await pipeline(nodeStream, writeAudio(filePath));
 
   return filePath;
-}
-
+};
 module.exports = {
   getZoomAccessToken,
   getZoomRecordings,

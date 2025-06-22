@@ -4,6 +4,6 @@ const { recordingsController } = require('../controllers/recordingsController');
 
 const router = express.Router();
 
-router.get('/', recordingsController);
+router.post('/', recordingsController);
 
 module.exports = router;

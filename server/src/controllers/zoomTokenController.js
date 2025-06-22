@@ -1,7 +1,7 @@
 const { getZoomAccessToken } = require('../services/zoomService');
 
-async function recordingsController(req, res) {
-  console.log('recordingsController')
+async function zoomTokenController(req, res) {
+  console.log('zoomTokenController')
   const zoomToken = await getZoomAccessToken();
 
   console.log('res', `zoomToken ${zoomToken}`)
@@ -9,5 +9,5 @@ async function recordingsController(req, res) {
 }
 
 module.exports = {
-  recordingsController
+  zoomTokenController
 }

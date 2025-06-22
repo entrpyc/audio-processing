@@ -5,7 +5,7 @@ const { returnSendingToTelegramStatus } = require('../services/telegramService')
 
 async function processAudioController(req, res) {
   if(!req?.body) return handleMissingRequestBody(req, res);
-  console.log('processAudioController', JSON.parse(req?.body))
+  console.log('processAudioController', req.body)
 
   const { title, date, sendToTelegram: sendToTelegramString, groupId, normalization, bitrate, applyFilters } = req.body;
   const sendToTelegram = JSON.parse(sendToTelegramString);
