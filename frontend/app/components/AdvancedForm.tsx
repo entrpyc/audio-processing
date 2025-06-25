@@ -31,9 +31,13 @@ const TELEGRAM_RECORDINGS_GROUP_ID = '-1002853673929'
 
 const bitrateOptions = [
   { value: 0, label: '24k' },
-  { value: 25, label: '56k' },
-  { value: 50, label: '96k' },
-  { value: 75, label: '128k' },
+  { value: 12.5, label: '32k' },
+  { value: 25, label: '48k' },
+  { value: 37.5, label: '64k' },
+  { value: 50, label: '80k' },
+  { value: 62.5, label: '96k' },
+  { value: 75, label: '112k' },
+  { value: 87.5, label: '128k' },
   { value: 100, label: '196k' },
 ];
 
