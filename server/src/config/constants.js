@@ -30,7 +30,6 @@ const ZOOM_RECORDINGS_URL = `${process.env.ZOOM_RECORDINGS_URL}?from=2025-01-01`
 const ZOOM_AUTH_TOKEN_URL = 'https://zoom.us/oauth/token';
 
 const DEFAULT_NORMALIZATION = '1.6';
-const DEFAULT_GROUP_ID = process.env.TELEGRAM_AUDIO_GROUP_ID;
 
 module.exports = {
   ROUTE,
@@ -42,5 +41,4 @@ module.exports = {
   ZOOM_RECORDINGS_URL,
   ZOOM_AUTH_TOKEN_URL,
   DEFAULT_NORMALIZATION,
-  DEFAULT_GROUP_ID,
 }

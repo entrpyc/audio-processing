@@ -9,6 +9,9 @@ const processAudio = ({
 }) => new Promise((resolve, reject) => {
   ffmpeg(inputPath)
     .audioBitrate(bitrate)
+    .audioChannels(1)
+    .audioFrequency(22050)
+    .outputOptions('-c:a libmp3lame', '-compression_level 5')
     .audioFilters(applyFilters ? filters : [])
     .on('end', () => {
       resolve();

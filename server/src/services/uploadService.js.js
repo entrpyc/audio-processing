@@ -9,8 +9,8 @@ const uploadToTelegram = async ({
   groupId
 }) => {
   try {
-    if(fileSize > TELEGRAM_AUDIO_SIZE_LIMIT) await sendDocumentToTelegram(outputPath, fileName);
-    else await sendAudioToTelegram(outputPath, title, groupId);
+    if(fileSize > TELEGRAM_AUDIO_SIZE_LIMIT) await sendDocumentToTelegram({ outputPath, fileName, groupId });
+    else await sendAudioToTelegram({ outputPath, title, groupId });
   } catch (err) {
     console.error('Telegram upload failed:', err);
   }

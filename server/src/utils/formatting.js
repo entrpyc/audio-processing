@@ -29,7 +29,7 @@ const createFileData = ({
   const formattedDate = formatDate(date);
   const formattedName = title.toLowerCase().charAt(0).toUpperCase() + title.slice(1);
   const fullTitle = `${formattedName} - ${formattedDate}`;
-  const fileName = `${title}.mp3`;
+  const fileName = `${fullTitle}.mp3`;
 
   return {
     inputPath: file.path,

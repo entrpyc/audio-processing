@@ -1,7 +1,6 @@
 const { uploadToTelegram, downloadFile } = require("./uploadService.js.js");
 const { deleteFile, readFile } = require('../utils/fileSystem.js');
 const { processAudio } = require("../utils/audioSystem.js");
-const { compressBitrate } = require("../utils/audioProcessing.js");
 const { getFilters } = require("../config/audio.js");
 const { parseMBtoBits } = require("../utils/formatting.js");
 
@@ -12,29 +11,28 @@ const handleSendAudioResult = async ({
 }) => {
   const {
     inputPath,
-    title,
-    fileName,
     outputPath,
-    groupId,
   } = fileData;
 
   const file = readFile(outputPath);
   const fileSize = parseMBtoBits(file.size);
 
   if(!sendToTelegram) await downloadFile({ outputPath, res });
-  else await uploadToTelegram({ fileSize, outputPath, fileName, title, groupId });
+  else await uploadToTelegram({ fileSize, outputPath, ...fileData });
 
   deleteFile(inputPath);
   deleteFile(outputPath);
 }
 
 const processAudioAndSendResult = async ({ fileData, sendToTelegram, res }) => {
-  const { inputPath, outputPath, fileSize, bitrate, normalization, applyFilters } = fileData;
+  const { inputPath, outputPath, bitrate, normalization, applyFilters } = fileData;
+
+  console.log('processAudioAndSendResult', fileData)
 
   await processAudio({
     inputPath,
     outputPath,
-    bitrate: applyFilters ? bitrate || compressBitrate(fileSize) : '196k',
+    bitrate: applyFilters ? bitrate : '64k',
     filters: getFilters({ normalization }),
     applyFilters
   });

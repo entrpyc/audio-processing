@@ -1,12 +1,12 @@
 const axios = require('axios');
 const FormData = require('form-data');
-const { ROUTE, TELEGRAM_SEND_MESSAGE_URL, TELEGRAM_SEND_AUDIO_URL, DEFAULT_GROUP_ID } = require('../config/constants');
+const { ROUTE, TELEGRAM_SEND_MESSAGE_URL, TELEGRAM_SEND_AUDIO_URL } = require('../config/constants');
 const { readAudio, copyFile } = require('../utils/fileSystem');
 
-async function sendAudioToTelegram(filePath, title, groupId) {
+async function sendAudioToTelegram({ outputPath, title, groupId }) {
   const form = new FormData();
-  form.append('chat_id', groupId || DEFAULT_GROUP_ID);
-  form.append('audio', readAudio(filePath));
+  form.append('chat_id', groupId);
+  form.append('audio', readAudio(outputPath));
   form.append('title', title);
 
   await axios.post(
@@ -16,8 +16,8 @@ async function sendAudioToTelegram(filePath, title, groupId) {
   );
 }
 
-async function sendDocumentToTelegram(filePath, fileName) {
-  copyFile(filePath, `${ROUTE.PUBLIC.DOWNLOADS}/${fileName}`);
+async function sendDocumentToTelegram({ outputPath, fileName, groupId}) {
+  copyFile(outputPath, `${ROUTE.PUBLIC.DOWNLOADS}/${fileName}`);
 
   const downloadUrl = `${ROUTE.SERVER_URL}/${ROUTE.PUBLIC.DOWNLOAD}?file=${encodeURIComponent(fileName)}`;
 
@@ -26,7 +26,7 @@ async function sendDocumentToTelegram(filePath, fileName) {
   await axios.post(
     TELEGRAM_SEND_MESSAGE_URL,
     {
-      chat_id: process.env.TELEGRAM_DOCUMENTS_GROUP_ID,
+      chat_id: groupId,
       text: message,
       parse_mode: 'Markdown'
     }
