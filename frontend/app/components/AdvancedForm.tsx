@@ -25,9 +25,9 @@ import { downloadFile, formatDate, formatTitle } from '../utils/helpers';
 import { ZoomRecording } from '../types/types';
 import css from '../style/styles.module.css';
 
-const TELEGRAM_OIL_OF_GLADNESS_ID = '-1001388987517'
-const TELEGRAM_SHEAF_YARD_GROUP_ID = '-10013889875175'
-const TELEGRAM_RECORDINGS_GROUP_ID = '-4862262334'
+const TELEGRAM_OIL_OF_GLADNESS_ID = '-1002286427385'
+const TELEGRAM_SHEAF_YARD_GROUP_ID = '-1001388987517'
+const TELEGRAM_RECORDINGS_GROUP_ID = '-1002853673929'
 
 const bitrateOptions = [
   { value: 0, label: '24k' },
