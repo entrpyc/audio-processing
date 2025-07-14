@@ -1,5 +1,5 @@
 const { formatDate } = require('../utils/formatting');
-const { ZOOM_RECORDING_FILE_TYPE, ROUTE, ZOOM_RECORDINGS_URL, ZOOM_AUTH_TOKEN_URL } = require('../config/constants');
+const { ZOOM_RECORDING_FILE_TYPE, ROUTE, ZOOM_AUTH_TOKEN_URL } = require('../config/constants');
 const { Readable } = require('stream');
 const { pipeline } = require('stream/promises');
 const { writeAudio } = require('../utils/fileSystem');

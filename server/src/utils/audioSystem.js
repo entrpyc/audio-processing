@@ -1,5 +1,5 @@
 const ffmpeg = require('fluent-ffmpeg');
-const { log } = require('./logger');
+const { log, logError } = require('./logger');
 
 const processAudio = ({
   inputPath,
@@ -25,7 +25,7 @@ const processAudio = ({
       resolve();
     })
     .on('error', (err) => {
-      console.error('FFmpeg error:', err);
+      logError('FFmpeg error:', err);
       reject(new Error('FFmpeg processing failed'));
     })
     .save(outputPath);

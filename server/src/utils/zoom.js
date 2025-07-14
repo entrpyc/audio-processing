@@ -1,5 +1,5 @@
 const { ZOOM_RECORDINGS_URL } = require("../config/constants");
-const { log } = require("./logger");
+const { log, logError } = require("./logger");
 
 async function fetchZoomRecordings({ zoomToken }) {
   const format = (d) => d.toISOString().split("T")[0];
@@ -43,7 +43,7 @@ async function fetchZoomRecordings({ zoomToken }) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Zoom API Error:', data);
+      logError('Zoom API Error:', data);
       throw new Error(data.message || 'Failed to fetch recordings');
     }
     

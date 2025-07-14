@@ -1,7 +1,7 @@
-const { log } = require("./logger");
+const { log, logError } = require("./logger");
 
 const handleServerError = ({ res, error }) => {
-  console.error('Unhandled error:', error);
+  logError('Unhandled error:', error);
   log('res', 'Internal server error')
   res.status(500).json({ error: 'Internal server error' });
 }
@@ -25,7 +25,7 @@ const validateRequiredParams = (res, params) => {
 
 const handleRouteErrors = (fn) => {
   if (typeof fn !== 'function') {
-    throw new TypeError(`Expected function, got ${typeof fn}`);
+    throw new Error(`Expected function, got ${typeof fn}`);
   }
 
   return function (req, res, next) {
