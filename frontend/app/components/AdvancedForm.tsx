@@ -356,7 +356,7 @@ export default function AdvancedForm({ recordings, zoomToken }: { recordings: Zo
                       onChange={setBitrate}
                       defaultValue={50}
                       label={(val) => bitrateOptions.find((opt) => opt.value === val)!.label}
-                      step={25}
+                      step={12.5}
                       marks={bitrateOptions}
                     />
                   </Stack>
