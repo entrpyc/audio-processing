@@ -27,7 +27,7 @@ const createFileData = ({
   applyFilters,
 }) => {
   const formattedDate = formatDate(date);
-  const formattedName = title.toLowerCase().charAt(0).toUpperCase() + title.slice(1);
+  const formattedName = title.toLwowerCase().charAt(0).toUpperCase() + title.slice(1);
   const fullTitle = `${formattedName} - ${formattedDate}`;
   const fileName = `${fullTitle}.mp3`;
 
