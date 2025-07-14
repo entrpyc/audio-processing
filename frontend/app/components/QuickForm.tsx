@@ -23,6 +23,14 @@ const TELEGRAM_OIL_OF_GLADNESS_ID = '-1002286427385'
 const TELEGRAM_SHEAF_YARD_GROUP_ID = '-1001388987517'
 const TELEGRAM_RECORDINGS_GROUP_ID = '-1002853673929'
 
+const bitrateOptions = [
+  { value: 0, label: '24k' },
+  { value: 25, label: '56k' },
+  { value: 50, label: '96k' },
+  { value: 75, label: '128k' },
+  { value: 100, label: '196k' },
+];
+
 const telegramGroups = [
   { value: TELEGRAM_SHEAF_YARD_GROUP_ID, label: 'Sheaf Yard' },
   { value: TELEGRAM_OIL_OF_GLADNESS_ID, label: 'Oil of Gladness' },
