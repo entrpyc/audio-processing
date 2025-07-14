@@ -2,6 +2,7 @@ const axios = require('axios');
 const FormData = require('form-data');
 const { ROUTE, TELEGRAM_SEND_MESSAGE_URL, TELEGRAM_SEND_AUDIO_URL } = require('../config/constants');
 const { readAudio, copyFile } = require('../utils/fileSystem');
+const { log } = require('../utils/logger');
 
 async function sendAudioToTelegram({ outputPath, title, groupId }) {
   const form = new FormData();
@@ -34,7 +35,7 @@ async function sendDocumentToTelegram({ outputPath, fileName, groupId}) {
 }
 
 const returnSendingToTelegramStatus = (res) => {
-  console.log('res', 'Uploaded! The recording will be posted to Telegram once its processed')
+  log('res', 'Uploaded! The recording will be posted to Telegram once its processed')
   res.status(200).json({
     status: 'Uploaded! The recording will be posted to Telegram once its processed'
   });

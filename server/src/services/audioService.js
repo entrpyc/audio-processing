@@ -3,6 +3,7 @@ const { deleteFile, readFile } = require('../utils/fileSystem.js');
 const { processAudio } = require("../utils/audioSystem.js");
 const { getFilters } = require("../config/audio.js");
 const { parseMBtoBits } = require("../utils/formatting.js");
+const { log } = require("../utils/logger.js");
 
 const handleSendAudioResult = async ({
   fileData,
@@ -27,7 +28,7 @@ const handleSendAudioResult = async ({
 const processAudioAndSendResult = async ({ fileData, sendToTelegram, res }) => {
   const { inputPath, outputPath, bitrate, normalization, applyFilters } = fileData;
 
-  console.log('processAudioAndSendResult', fileData)
+  log('processAudioAndSendResult', fileData)
 
   await processAudio({
     inputPath,

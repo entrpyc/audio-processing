@@ -7,6 +7,7 @@ const processZoomRecordingRoute = require('./src/routes/processZoomRecordingRout
 const recordingsRoute = require('./src/routes/recordingsRoute');
 const { FILE_SIZE_LIMIT, ROUTE } = require('./src/config/constants');
 const { handleServerError, handleRouteErrors } = require('./src/utils/errorHandling');
+const { log } = require('./src/utils/logger');
 const { setupServerFolders } = require('./src/utils/setup');
 const { cleanTempFiles } = require('./cron/cleanup');
 
@@ -24,7 +25,7 @@ app.use(express.urlencoded({ extended: true, limit: `${FILE_SIZE_LIMIT}mb` }));
 
 app.use(express.static(ROUTE.PUBLIC.INDEX));
 app.get(ROUTE.HEALTH, (req, res) => {
-  console.log('res', 'OK')
+  log('res', 'OK')
   res.status(200).json({ status: 'OK' })
 });
 
@@ -34,7 +35,7 @@ app.use(ROUTE.RECORDINGS, handleRouteErrors(recordingsRoute));
 app.use(ROUTE.ZOOM_TOKEN, handleRouteErrors(zoomTokenRoute));
 
 app.use((req, res) => {
-  console.log('res', 'Route not found')
+  log('res', 'Route not found')
   res.status(404).json({ error: 'Route not found' });
 });
 
@@ -42,4 +43,4 @@ app.use((err, req, res, next) => {
   handleServerError({ res, error: err });
 });
 
-app.listen(process.env.PORT, () => console.log(`Server running on port ${process.env.PORT}`));
+app.listen(process.env.PORT, () => log(`Server running on port ${process.env.PORT}`));

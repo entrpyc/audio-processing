@@ -1,4 +1,5 @@
 const ffmpeg = require('fluent-ffmpeg');
+const { log } = require('./logger');
 
 const processAudio = ({
   inputPath,
@@ -7,6 +8,13 @@ const processAudio = ({
   filters,
   applyFilters
 }) => new Promise((resolve, reject) => {
+  log({
+    inputPath,
+    outputPath,
+    bitrate,
+    filters,
+    applyFilters
+  })
   ffmpeg(inputPath)
     .audioBitrate(bitrate)
     .audioChannels(1)

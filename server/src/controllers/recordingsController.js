@@ -1,9 +1,10 @@
 const { getZoomRecordings } = require('../services/zoomService');
 const { validateRequiredParams } = require('../utils/errorHandling');
+const { log } = require('../utils/logger');
 
 async function recordingsController(req, res) {
   if(!req?.body) return handleMissingRequestBody(req, res);
-  console.log('recordingsController', req.body)
+  log('recordingsController', req.body)
 
   const { zoomToken } = req.body;
 
@@ -12,7 +13,7 @@ async function recordingsController(req, res) {
 
   const recordings = await getZoomRecordings({ zoomToken });
 
-  console.log('res', 'recordings')
+  log('res', 'recordings')
   return res.status(200).json({ recordings });
 }
 

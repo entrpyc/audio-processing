@@ -1,6 +1,7 @@
 const path = require("path");
 
 const { findFolder, createFolder } = require("./fileSystem");
+const { log } = require("./logger");
 
 const setupServerFolders = () => {
   const foldersToEnsure = [
@@ -12,7 +13,7 @@ const setupServerFolders = () => {
   foldersToEnsure.forEach(folder => {
     if (!findFolder(folder)) {
       createFolder(folder);
-      console.log(`Created folder: ${folder}`);
+      log(`Created folder: ${folder}`);
     }
   });
 }

@@ -2,10 +2,11 @@ const { createFileData } = require('../utils/formatting');
 const { handleMissingRequestBody, validateRequiredParams } = require('../utils/errorHandling');
 const { processAudioAndSendResult } = require('../services/audioService');
 const { returnSendingToTelegramStatus } = require('../services/telegramService');
+const { log } = require('../utils/logger');
 
 async function processAudioController(req, res) {
   if(!req?.body) return handleMissingRequestBody(req, res);
-  console.log('processAudioController', req.body)
+  log('processAudioController', req.body)
 
   const { title, date, sendToTelegram: sendToTelegramString, groupId, normalization, bitrate, applyFilters } = req.body;
   const sendToTelegram = JSON.parse(sendToTelegramString);

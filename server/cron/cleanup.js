@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const path = require('path');
 const { ROUTE } = require('../src/config/constants');
 const { openFolder, deleteFileAsync } = require('../src/utils/fileSystem');
+const { log } = require('../src/utils/logger');
 
 const foldersToClean = [
   path.join(__dirname, `../${ROUTE.PUBLIC.DOWNLOADS}`),
@@ -27,7 +28,7 @@ const cleanTempFiles = () => {
 
 // Every Monday at 00:00
 cron.schedule('0 0 * * 1', () => {
-  console.log('[CLEANUP] Weekly cleanup started...');
+  log('[CLEANUP] Weekly cleanup started...');
   foldersToClean.forEach(clearFolder);
 });
 

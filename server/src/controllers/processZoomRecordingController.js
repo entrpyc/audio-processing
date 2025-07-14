@@ -4,10 +4,11 @@ const { downloadZoomRecording } = require('../services/zoomService.js');
 const { validateRequiredParams, handleMissingRequestBody } = require('../utils/errorHandling.js');
 const { returnSendingToTelegramStatus } = require('../services/telegramService.js');
 const { processAudioAndSendResult } = require('../services/audioService.js');
+const { log } = require('../utils/logger.js');
 
 async function processZoomRecordingController(req, res) {
   if(!req?.body) return handleMissingRequestBody(req, res);
-  console.log('processZoomRecordingController', req.body)
+  log('processZoomRecordingController', req.body)
 
   const { title, date, downloadUrl, sendToTelegram, groupId, normalization, bitrate, applyFilters, zoomToken } = req.body;
   const validParams = validateRequiredParams(res, { title, date, downloadUrl, upload: sendToTelegram ? groupId : true, zoomToken })
