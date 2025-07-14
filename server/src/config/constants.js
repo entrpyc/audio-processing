@@ -26,7 +26,7 @@ const ZOOM_RECORDING_FILE_TYPE = 'M4A';
 const TELEGRAM_SEND_MESSAGE_URL = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`;
 const TELEGRAM_SEND_AUDIO_URL = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendAudio`;
 
-const ZOOM_RECORDINGS_URL = `${process.env.ZOOM_RECORDINGS_URL}?from=2025-01-01`;
+const ZOOM_RECORDINGS_URL = `https://api.zoom.us/v2/users/${process.env.ZOOM_USER_ID}/recordings`;
 const ZOOM_AUTH_TOKEN_URL = 'https://zoom.us/oauth/token';
 
 const DEFAULT_NORMALIZATION = '1.6';

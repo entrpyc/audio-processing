@@ -3,6 +3,7 @@ const { ZOOM_RECORDING_FILE_TYPE, ROUTE, ZOOM_RECORDINGS_URL, ZOOM_AUTH_TOKEN_UR
 const { Readable } = require('stream');
 const { pipeline } = require('stream/promises');
 const { writeAudio } = require('../utils/fileSystem');
+const { fetchZoomRecordings } = require('../utils/zoom');
 
 const getZoomAccessToken = async () => {
   const res = await fetch(ZOOM_AUTH_TOKEN_URL, {
@@ -25,21 +26,9 @@ const getZoomAccessToken = async () => {
 };
 
 const getZoomRecordings = async ({ zoomToken }) => {
-  const response = await fetch(ZOOM_RECORDINGS_URL, {
-    headers: {
-      Authorization: `Bearer ${zoomToken}`,
-      'Content-Type': 'application/json',
-    }
-  })
+  const recordings = await fetchZoomRecordings({ zoomToken })
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    console.error('Zoom API Error:', data);
-    throw new Error(data.message || 'Failed to fetch recordings');
-  }
-
-  const mappedRecordings = data.meetings.map(recording => ({
+  const mappedRecordings = recordings.map(recording => ({
     id: recording.id,
     date: formatDate(recording.start_time),
     dateRaw: recording.start_time.split('T')[0],

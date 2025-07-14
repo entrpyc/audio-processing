@@ -13,7 +13,7 @@ async function recordingsController(req, res) {
 
   const recordings = await getZoomRecordings({ zoomToken });
 
-  log('res', 'recordings')
+  log('res', recordings)
   return res.status(200).json({ recordings });
 }
 
