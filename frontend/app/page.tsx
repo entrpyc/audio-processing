@@ -5,46 +5,38 @@ import { useEffect, useState } from 'react';
 import AdvancedForm from './components/AdvancedForm';
 import { ZoomRecording } from './types/types';
 import QuickForm from './components/QuickForm';
+import { fetchToken } from './utils/zoomToken';
+import { fetchRecordings } from './utils/zoomRecordings';
+
+enum TABS {
+  QUICK = 'QUICK',
+  ADVACNED = 'ADVACNED',
+}
 
 export default function Home() {
-  const [value, setValue] = useState('quick');
+  const [activeTab, setActiveTab] = useState(TABS.QUICK);
   const [zoomToken, setZoomToken] = useState<string>();
   const [recordings, setRecordings] = useState<ZoomRecording[]>([]);
 
-useEffect(() => {
-  const fetchToken = async () => {
-    const res = await fetch('https://audio-processing.indepthwebsolutions.com/api/zoom-token');
-    const data = await res.json();
-    
-    if (!data.error) {
-      setZoomToken(data.zoomToken);
-    }
-  };
+  const handleZoomToken = async () => {
+    const tokenRes = await fetchToken();
+    setZoomToken(tokenRes);
+  }
 
-  fetchToken();
+  const handleZoomRecordings = async () => {
+    if(!zoomToken) return;
 
-  const interval = setInterval(fetchToken, 10 * 60 * 1000);
-
-  return () => clearInterval(interval);
-}, []);
+    const recordingsRes = await fetchRecordings(zoomToken);
+    setRecordings(recordingsRes);
+    console.log(recordingsRes)
+  }
 
   useEffect(() => {
-    const fetchRecordings = async () => {
-      const res = await fetch('https://audio-processing.indepthwebsolutions.com/api/recordings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ zoomToken }),
-      });
-      const data = await res.json();
-      
-      if(data.error) return;
+    handleZoomToken();
+  }, []);
 
-      setRecordings(data.recordings?.filter((rec: ZoomRecording) => Boolean(rec.downloadUrl)) || []);
-    }
-
-    if(zoomToken) fetchRecordings();
+  useEffect(() => {
+    handleZoomRecordings();
   }, [zoomToken])
 
   return (
@@ -56,14 +48,14 @@ useEffect(() => {
             mt={40}
             fullWidth
             size="lg"
-            value={value}
-            onChange={setValue}
+            value={activeTab}
+            onChange={v => setActiveTab(v as TABS)}
             data={[
-              { label: 'Quick Submission', value: 'quick' },
-              { label: 'Advanced Submission', value: 'advanced' },
+              { label: 'Quick Submission', value: TABS.QUICK },
+              { label: 'Advanced Submission', value: TABS.ADVACNED },
             ]}
           />
-          {value === 'quick' ? (
+          {activeTab === TABS.QUICK ? (
             <QuickForm recordings={recordings} zoomToken={zoomToken} />
           ): (
             <AdvancedForm recordings={recordings} zoomToken={zoomToken} />
