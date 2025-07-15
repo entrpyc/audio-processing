@@ -40,8 +40,8 @@ const createFileData = ({
     date: formattedDate,
     name: formattedName,
     groupId,
-    normalization: normalization ?? DEFAULT_NORMALIZATION,
-    bitrate: bitrate ?? DEFAULT_BITRATE,
+    normalization: Number(normalization) ?? DEFAULT_NORMALIZATION,
+    bitrate: Number(bitrate) ?? DEFAULT_BITRATE,
     applyFilters: JSON.parse(applyFilters ?? DEFAULT_APPLY_FILTERS),
   }
 }
