@@ -3,7 +3,7 @@ const { DEFAULT_NORMALIZATION } = require("./constants")
 const getFilters = ({ normalization }) => {
   const normalizeVolume = [
     'dynaudnorm',
-    `volume=${normalization || DEFAULT_NORMALIZATION}`,
+    `volume=${normalization}`,
   ]
 
   const speechOptimization = [

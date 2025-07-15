@@ -19,7 +19,7 @@ const handleSendAudioResult = async ({
   const fileSize = parseMBtoBits(file.size);
 
   if(!sendToTelegram) await downloadFile({ outputPath, res });
-  else await uploadToTelegram({ fileSize, outputPath, ...fileData });
+  else await uploadToTelegram({ ...fileData, outputPath, fileSize });
 
   deleteFile(inputPath);
   deleteFile(outputPath);
@@ -33,12 +33,12 @@ const processAudioAndSendResult = async ({ fileData, sendToTelegram, res }) => {
   await processAudio({
     inputPath,
     outputPath,
-    bitrate: applyFilters ? bitrate : '64k',
+    bitrate,
     filters: getFilters({ normalization }),
     applyFilters
   });
 
-  handleSendAudioResult({
+  await handleSendAudioResult({
     fileData,
     res,
     sendToTelegram,

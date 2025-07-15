@@ -8,18 +8,12 @@ const processAudio = ({
   filters,
   applyFilters
 }) => new Promise((resolve, reject) => {
-  log({
-    inputPath,
-    outputPath,
-    bitrate,
-    filters,
-    applyFilters
-  })
   ffmpeg(inputPath)
     .audioBitrate(bitrate)
     .audioChannels(1)
-    .audioFrequency(22050)
-    .outputOptions('-c:a libmp3lame', '-compression_level 5')
+    .audioFrequency(16000)
+    .audioCodec('libmp3lame')
+    .outputOptions('-compression_level 5')
     .audioFilters(applyFilters ? filters : [])
     .on('end', () => {
       resolve();

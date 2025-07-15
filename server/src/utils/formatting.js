@@ -1,4 +1,4 @@
-const { ROUTE } = require("../config/constants");
+const { ROUTE, DEFAULT_NORMALIZATION, DEFAULT_BITRATE, DEFAULT_APPLY_FILTERS } = require("../config/constants");
 
 function formatDate(inputDate) {
   const date = new Date(inputDate);
@@ -27,7 +27,7 @@ const createFileData = ({
   applyFilters,
 }) => {
   const formattedDate = formatDate(date);
-  const formattedName = title.toLwowerCase().charAt(0).toUpperCase() + title.slice(1);
+  const formattedName = title.toLowerCase().charAt(0).toUpperCase() + title.slice(1);
   const fullTitle = `${formattedName} - ${formattedDate}`;
   const fileName = `${fullTitle}.mp3`;
 
@@ -40,9 +40,9 @@ const createFileData = ({
     date: formattedDate,
     name: formattedName,
     groupId,
-    normalization,
-    bitrate,
-    applyFilters: JSON.parse(applyFilters ?? 'true'),
+    normalization: normalization ?? DEFAULT_NORMALIZATION,
+    bitrate: bitrate ?? DEFAULT_BITRATE,
+    applyFilters: JSON.parse(applyFilters ?? DEFAULT_APPLY_FILTERS),
   }
 }
 
