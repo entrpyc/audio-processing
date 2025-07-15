@@ -1,0 +1,2 @@
+export const ZOOM_TOKEN_ENDPOINT = 'https://audio-processing.indepthwebsolutions.com/api/zoom-token';
+export const ZOOM_RECORDINGS_ENDPOINT = 'https://audio-processing.indepthwebsolutions.com/api/recordings';
