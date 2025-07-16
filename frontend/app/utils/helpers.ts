@@ -20,7 +20,7 @@ export const formatDate = (inputDate: string) => {
 export function formatTitle(inputDate: string, inputTitle: string) {  
   const formattedDate = formatDate(inputDate);
 
-  const formattedName = inputTitle.toLowerCase().charAt(0).toUpperCase() + inputTitle.slice(1);
+  const formattedName = capitalize(inputTitle);
   const title = `${formattedName} - ${formattedDate}`;
   const fileName = `${title}.mp3`;
 
@@ -38,4 +38,8 @@ export const downloadFile = async (res: Response, name: string) =>{
   document.body.appendChild(a);
   a.click();
   a.remove();
+}
+
+export const capitalize = (value: string) => {
+  return value.toLowerCase().charAt(0).toUpperCase() + value.slice(1)
 }

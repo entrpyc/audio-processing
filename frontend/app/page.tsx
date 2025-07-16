@@ -28,7 +28,6 @@ export default function Home() {
 
     const recordingsRes = await fetchRecordings(zoomToken);
     setRecordings(recordingsRes);
-    console.log(recordingsRes)
   }
 
   useEffect(() => {

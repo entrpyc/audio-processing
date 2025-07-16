@@ -18,30 +18,8 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { ZoomRecording } from '../types/types';
 import css from '../style/styles.module.css';
-
-const TELEGRAM_OIL_OF_GLADNESS_ID = '-1002286427385'
-const TELEGRAM_SHEAF_YARD_GROUP_ID = '-1001388987517'
-const TELEGRAM_RECORDINGS_GROUP_ID = '-1002853673929'
-
-const bitrateOptions = [
-  { value: 0, label: '24k' },
-  { value: 25, label: '56k' },
-  { value: 50, label: '96k' },
-  { value: 75, label: '128k' },
-  { value: 100, label: '196k' },
-];
-
-const telegramGroups = [
-  { value: TELEGRAM_SHEAF_YARD_GROUP_ID, label: 'Sheaf Yard' },
-  { value: TELEGRAM_OIL_OF_GLADNESS_ID, label: 'Oil of Gladness' },
-  { value: TELEGRAM_RECORDINGS_GROUP_ID, label: 'Audio Recordings' },
-]
-
-const APP_STATES = {
-  INIT: 'init',
-  STARTED: 'started',
-  COMPLETED: 'completed',
-}
+import { APP_STATES, TELEGRAM_GROUPS, TELEGRAM_SHEAF_YARD_GROUP_ID } from '../utils/config';
+import { handleZoomRecordingUpload } from '../utils/requests';
 
 export default function QuickForm({ recordings, zoomToken }: { recordings: ZoomRecording[], zoomToken: string | undefined }) {
   const [status, setStatus] = useState('');
@@ -50,7 +28,6 @@ export default function QuickForm({ recordings, zoomToken }: { recordings: ZoomR
   const [appState, setAppState] = useState(APP_STATES.INIT);
   const [appErrorState, setAppErrorState] = useState<boolean>(false);
   
-
   const fieldRefs = {
     audioFile: useRef<HTMLInputElement>(null),
     title: useRef<HTMLInputElement>(null),
@@ -71,35 +48,29 @@ export default function QuickForm({ recordings, zoomToken }: { recordings: ZoomR
 
   const selectedDate = `${selectedRecording?.dateRaw}`;
 
-  const handleZoomRecordingUpload = async (values: typeof form.values) => {
-    const body = {
-      title: values.title,
-      date: selectedDate,
-      downloadUrl: selectedRecording?.downloadUrl,
-      zoomToken,
-      sendToTelegram: true,
-      groupId: group,
-      applyFilters: true,
-    };
+  const handleSubmit = async () => {
+    const validation = form.validate();
 
-    const res = await fetch(process.env.NEXT_PUBLIC_PROCESS_ZOOM_RECORDING as string, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body),
-    });
+    if (validation.hasErrors || !selectedRecording?.downloadUrl || !zoomToken) {
+      const firstErrorKey = Object.keys(validation.errors)[0] as keyof typeof fieldRefs;
+      fieldRefs[firstErrorKey]?.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      fieldRefs[firstErrorKey]?.current?.focus();
+      
+      return;
+    }
 
-    return res;
-  }
-
-  const handleSubmit = async (values: typeof form.values) => {
     setAppState(APP_STATES.STARTED);
     setStatus('🚀 Uploading');
     
     try {
-      const res = await handleZoomRecordingUpload(values);
-
+      const res = await handleZoomRecordingUpload({
+        title: form.values.title,
+        date: selectedDate,
+        downloadUrl: selectedRecording?.downloadUrl,
+        groupId: group,
+        zoomToken,
+        sendToTelegram: true,
+      });
 
       const data = await res.json();
 
@@ -141,16 +112,7 @@ export default function QuickForm({ recordings, zoomToken }: { recordings: ZoomR
     <form
       onSubmit={(event) => {
         event.preventDefault();
-
-        const validation = form.validate();
-
-        if (!validation.hasErrors) {
-          handleSubmit(form.values);
-        } else {
-          const firstErrorKey = Object.keys(validation.errors)[0] as keyof typeof fieldRefs;
-          fieldRefs[firstErrorKey]?.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          fieldRefs[firstErrorKey]?.current?.focus();
-        }
+        handleSubmit();
       }}
     >
       <Stack gap={40}>
@@ -205,7 +167,7 @@ export default function QuickForm({ recordings, zoomToken }: { recordings: ZoomR
                 disabled={appState !== APP_STATES.INIT}
                 label="Select a Telegram group"
                 placeholder="Pick one"
-                data={telegramGroups}
+                data={TELEGRAM_GROUPS}
                 value={group}
                 onChange={handleGroupClick}
               />
