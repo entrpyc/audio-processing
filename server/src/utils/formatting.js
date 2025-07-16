@@ -1,4 +1,4 @@
-const { ROUTE, DEFAULT_NORMALIZATION, DEFAULT_BITRATE, DEFAULT_APPLY_FILTERS } = require("../config/constants");
+const { ROUTE, DEFAULT_NORMALIZATION, DEFAULT_BITRATE, DEFAULT_APPLY_FILTERS, DEFAULT_FREQUENCY } = require("../config/constants");
 
 function formatDate(inputDate) {
   const date = new Date(inputDate);
@@ -22,6 +22,7 @@ const createFileData = ({
   title,
   date,
   groupId,
+  frequency,
   normalization,
   bitrate,
   applyFilters,
@@ -40,8 +41,9 @@ const createFileData = ({
     date: formattedDate,
     name: formattedName,
     groupId,
-    normalization: Number(normalization) ?? DEFAULT_NORMALIZATION,
-    bitrate: Number(bitrate) ?? DEFAULT_BITRATE,
+    normalization: Number(normalization ?? DEFAULT_NORMALIZATION),
+    bitrate: Number(bitrate ?? DEFAULT_BITRATE),
+    frequency: Number(frequency ?? DEFAULT_FREQUENCY),
     applyFilters: JSON.parse(applyFilters ?? DEFAULT_APPLY_FILTERS),
   }
 }

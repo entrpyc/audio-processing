@@ -30,6 +30,7 @@ const ZOOM_RECORDINGS_URL = `https://api.zoom.us/v2/users/${process.env.ZOOM_USE
 const ZOOM_AUTH_TOKEN_URL = 'https://zoom.us/oauth/token';
 
 const DEFAULT_NORMALIZATION = 1.6;
+const DEFAULT_FREQUENCY = 44100;
 const DEFAULT_BITRATE = 48;
 const DEFAULT_APPLY_FILTERS = 'true';
 
@@ -45,4 +46,5 @@ module.exports = {
   DEFAULT_NORMALIZATION,
   DEFAULT_BITRATE,
   DEFAULT_APPLY_FILTERS,
+  DEFAULT_FREQUENCY,
 }

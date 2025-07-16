@@ -26,7 +26,7 @@ const handleSendAudioResult = async ({
 }
 
 const processAudioAndSendResult = async ({ fileData, sendToTelegram, res }) => {
-  const { inputPath, outputPath, bitrate, normalization, applyFilters } = fileData;
+  const { inputPath, outputPath, bitrate, frequency, normalization, applyFilters } = fileData;
 
   log('processAudioAndSendResult', fileData)
 
@@ -34,6 +34,7 @@ const processAudioAndSendResult = async ({ fileData, sendToTelegram, res }) => {
     inputPath,
     outputPath,
     bitrate,
+    frequency,
     filters: getFilters({ normalization }),
     applyFilters
   });
