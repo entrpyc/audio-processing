@@ -31,7 +31,7 @@ const ZOOM_AUTH_TOKEN_URL = 'https://zoom.us/oauth/token';
 
 const DEFAULT_NORMALIZATION = 1.6;
 const DEFAULT_FREQUENCY = 44100;
-const DEFAULT_BITRATE = 48;
+const DEFAULT_BITRATE = 64;
 const DEFAULT_APPLY_FILTERS = 'true';
 
 module.exports = {
