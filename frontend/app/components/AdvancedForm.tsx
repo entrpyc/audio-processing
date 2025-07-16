@@ -21,37 +21,11 @@ import {
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { downloadFile, formatDate, formatTitle } from '../utils/helpers';
+import { capitalize, downloadFile, formatDate, formatTitle } from '../utils/helpers';
 import { ZoomRecording } from '../types/types';
 import css from '../style/styles.module.css';
-
-const TELEGRAM_OIL_OF_GLADNESS_ID = '-1002286427385'
-const TELEGRAM_SHEAF_YARD_GROUP_ID = '-1001388987517'
-const TELEGRAM_RECORDINGS_GROUP_ID = '-1002853673929'
-
-const bitrateOptions = [
-  { value: 0, label: '24k' },
-  { value: 12.5, label: '32k' },
-  { value: 25, label: '48k' },
-  { value: 37.5, label: '64k' },
-  { value: 50, label: '80k' },
-  { value: 62.5, label: '96k' },
-  { value: 75, label: '112k' },
-  { value: 87.5, label: '128k' },
-  { value: 100, label: '196k' },
-];
-
-const telegramGroups = [
-  { value: TELEGRAM_SHEAF_YARD_GROUP_ID, label: 'Sheaf Yard' },
-  { value: TELEGRAM_OIL_OF_GLADNESS_ID, label: 'Oil of Gladness' },
-  { value: TELEGRAM_RECORDINGS_GROUP_ID, label: 'Audio Recordings' },
-]
-
-const APP_STATES = {
-  INIT: 'init',
-  STARTED: 'started',
-  COMPLETED: 'completed',
-}
+import { APP_STATES, BITRATE_OPTIONS, FREQUENCY_OPTIONS, TELEGRAM_GROUPS, TELEGRAM_SHEAF_YARD_GROUP_ID } from '../utils/config';
+import { handleFileUpload, handleZoomRecordingUpload } from '../utils/requests';
 
 export default function AdvancedForm({ recordings, zoomToken }: { recordings: ZoomRecording[], zoomToken: string | undefined }) {
   const [status, setStatus] = useState('');
@@ -61,11 +35,11 @@ export default function AdvancedForm({ recordings, zoomToken }: { recordings: Zo
   const [group, setGroup] = useState<string>(TELEGRAM_SHEAF_YARD_GROUP_ID);
   const [filters, setFilters] = useState('default');
   const [volumeBoost, setVolumeBoost] = useState(1.6);
-  const [bitrate, setBitrate] = useState(50);
+  const [bitrate, setBitrate] = useState(25);
+  const [frequency, setFrequency] = useState(100);
   const [appState, setAppState] = useState(APP_STATES.INIT);
   const [appErrorState, setAppErrorState] = useState<boolean>(false);
   
-
   const fieldRefs = {
     audioFile: useRef<HTMLInputElement>(null),
     title: useRef<HTMLInputElement>(null),
@@ -87,64 +61,53 @@ export default function AdvancedForm({ recordings, zoomToken }: { recordings: Zo
   });
 
   const selectedDate = source === 'zoom-cloud' ? `${selectedRecording?.dateRaw}` : form.getValues().date;
-  const bitrateSubmitValue = bitrateOptions.find(v => v.value === bitrate)?.label;
+  const bitrateSubmitValue = BITRATE_OPTIONS.find(v => v.value === bitrate)?.formValue;
+  const frequencySubmitValue = FREQUENCY_OPTIONS.find(v => v.value === frequency)?.label;
 
-  const handleZoomRecordingUpload = async (values: typeof form.values) => {
-    const body = {
-      title: values.title,
-      date: selectedDate,
-      downloadUrl: selectedRecording?.downloadUrl,
-      zoomToken,
-      sendToTelegram: output === 'download' ? false : true,
-      groupId: group,
-      normalization: filters === 'custom' ? volumeBoost : undefined,
-      bitrate: filters === 'custom' && bitrateSubmitValue ? bitrateSubmitValue : undefined,
-      applyFilters: filters === 'no-filters' ? false : undefined,
-    };
+  const handleSubmit = async () => {
+    const validation = form.validate();
 
-    const res = await fetch(process.env.NEXT_PUBLIC_PROCESS_ZOOM_RECORDING as string, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body),
-    });
+    if (validation.hasErrors || !selectedRecording?.downloadUrl || !zoomToken) {
+      const firstErrorKey = Object.keys(validation.errors)[0] as keyof typeof fieldRefs;
+      fieldRefs[firstErrorKey]?.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      fieldRefs[firstErrorKey]?.current?.focus();
+    
+      return;
+    }
 
-    return res;
-  }
-
-  const handleFileUpload = async (values: typeof form.values) => {
-    const formData = new FormData();
-    formData.append('audio', values.audioFile as File);
-    formData.append('title', values.title);
-    formData.append('date', selectedDate);
-    formData.append('sendToTelegram', output === 'download' ? 'false' : 'true');
-    formData.append('groupId', group);
-    if(filters === 'custom') formData.append('normalization', volumeBoost.toString());
-    if(filters === 'custom' && bitrateSubmitValue) formData.append('bitrate', bitrateSubmitValue);
-    if(filters === 'no-filters') formData.append('applyFilters', 'false');
-
-    const res = await fetch(process.env.NEXT_PUBLIC_PROCESS_AUDIO_ENDPOINT as string, {
-      method: 'POST',
-      body: formData,
-    });
-
-    return res;
-  }
-
-  const handleSubmit = async (values: typeof form.values) => {
     setAppState(APP_STATES.STARTED);
     setStatus('🚀 Uploading');
     
     try {
       let res;
 
-      if(source === 'upload') res = await handleFileUpload(values);
-      else res = await handleZoomRecordingUpload(values);
+      if(source === 'upload') res = await handleFileUpload({
+        audioFile: form.values.audioFile as File,
+        title: form.values.title,
+        date: selectedDate,
+        sendToTelegram: output === 'download' ? false : true,
+        groupId: group,
+        normalization: volumeBoost.toString(),
+        bitrate: bitrateSubmitValue?.toString(),
+        frequency: frequencySubmitValue?.toString(),
+        filters,
+      });
+      else res = await handleZoomRecordingUpload({
+        title: form.values.title,
+        date: selectedDate,
+        downloadUrl: selectedRecording?.downloadUrl,
+        zoomToken,
+        sendToTelegram: output === 'download' ? false : true,
+        groupId: group,
+        normalization: volumeBoost.toString(),
+        bitrate: bitrateSubmitValue?.toString(),
+        frequency: frequencySubmitValue?.toString(),
+        applyFilters: filters === 'no-filters' ? false : true,
+      });
 
       if(output === 'download') {
         setStatus(`📥 Converted successfully. Downloading....`);
-        await downloadFile(res, formatTitle(selectedDate, values.title));
+        await downloadFile(res, formatTitle(selectedDate, form.values.title));
         setStatus(`✅ Downloaded successfully!`);
 
         return;
@@ -190,16 +153,7 @@ export default function AdvancedForm({ recordings, zoomToken }: { recordings: Zo
     <form
       onSubmit={(event) => {
         event.preventDefault();
-
-        const validation = form.validate();
-
-        if (!validation.hasErrors) {
-          handleSubmit(form.values);
-        } else {
-          const firstErrorKey = Object.keys(validation.errors)[0] as keyof typeof fieldRefs;
-          fieldRefs[firstErrorKey]?.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          fieldRefs[firstErrorKey]?.current?.focus();
-        }
+        handleSubmit();
       }}
     >
       <Stack gap={40}>
@@ -297,7 +251,7 @@ export default function AdvancedForm({ recordings, zoomToken }: { recordings: Zo
                   disabled={appState !== APP_STATES.INIT}
                   label="Select a Telegram group"
                   placeholder="Pick one"
-                  data={telegramGroups}
+                  data={TELEGRAM_GROUPS}
                   value={group}
                   onChange={handleGroupClick}
                 />
@@ -354,10 +308,23 @@ export default function AdvancedForm({ recordings, zoomToken }: { recordings: Zo
                       size="lg"
                       value={bitrate}
                       onChange={setBitrate}
-                      defaultValue={50}
-                      label={(val) => bitrateOptions.find((opt) => opt.value === val)!.label}
+                      defaultValue={25}
+                      label={(val) => BITRATE_OPTIONS.find((opt) => opt.value === val)!.label}
                       step={12.5}
-                      marks={bitrateOptions}
+                      marks={BITRATE_OPTIONS}
+                    />
+                  </Stack>
+                  <Stack>
+                    <Text size="sm">Frequency</Text>
+                    <Slider
+                      disabled={appState !== APP_STATES.INIT}
+                      size="lg"
+                      value={frequency}
+                      onChange={setFrequency}
+                      defaultValue={100}
+                      label={(val) => FREQUENCY_OPTIONS.find((opt) => opt.value === val)!.label}
+                      step={25}
+                      marks={FREQUENCY_OPTIONS}
                     />
                   </Stack>
                 </Stack>
@@ -368,11 +335,11 @@ export default function AdvancedForm({ recordings, zoomToken }: { recordings: Zo
 
         <Paper shadow="md" withBorder p={20}>
           <Title order={2} mb="sm">Confirm and Upload</Title>
-          <Text><strong>Title:</strong> {form.getValues().title || '-'}</Text>
+          <Text><strong>Title:</strong> {capitalize(form.getValues().title || '-')}</Text>
           <Text><strong>Date:</strong> {source === 'zoom-cloud' && !selectedRecording?.date ? '-' : selectedDate ? formatDate(selectedDate) : '-'}</Text>
           <Text><strong>Source:</strong> {source === 'zoom-cloud' ? `Cloud recording from ${selectedRecording?.date ?? '-'}` : `Uploaded file "${form.getValues().audioFile?.name || '-'}"`}</Text>
-          <Text><strong>Output:</strong> {output === 'download' ? 'Download to this device' : telegramGroups.find(g => g.value === group)?.label}</Text>
-          <Text><strong>Filters:</strong> {(filters === 'default' && 'Default filters') || (filters === 'no-filters' && 'No filters') || `Volume boost - ${volumeBoost}, Bitrate - ${bitrateOptions.find(v => v.value === bitrate)?.label}`}</Text>
+          <Text><strong>Output:</strong> {output === 'download' ? 'Download to this device' : TELEGRAM_GROUPS.find(g => g.value === group)?.label}</Text>
+          <Text><strong>Filters:</strong> {(filters === 'default' && 'Default filters') || (filters === 'no-filters' && 'No filters') || `Volume boost - ${volumeBoost}, Bitrate - ${BITRATE_OPTIONS.find(v => v.value === bitrate)?.label}, Frequency - ${FREQUENCY_OPTIONS.find(v => v.value === frequency)?.label}`}</Text>
           <Divider my={20} />
           {appState === APP_STATES.INIT && (
             <Button type="submit" fullWidth disabled={!zoomToken}>Submit</Button>
