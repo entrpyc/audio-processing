@@ -35,7 +35,7 @@ export default function AdvancedForm({ recordings, zoomToken }: { recordings: Zo
   const [group, setGroup] = useState<string>(TELEGRAM_SHEAF_YARD_GROUP_ID);
   const [filters, setFilters] = useState('default');
   const [volumeBoost, setVolumeBoost] = useState(1.6);
-  const [bitrate, setBitrate] = useState(25);
+  const [bitrate, setBitrate] = useState(37.5);
   const [frequency, setFrequency] = useState(100);
   const [appState, setAppState] = useState(APP_STATES.INIT);
   const [appErrorState, setAppErrorState] = useState<boolean>(false);
@@ -199,7 +199,7 @@ export default function AdvancedForm({ recordings, zoomToken }: { recordings: Zo
                 label="Audio File"
                 placeholder="Select a file"
                 withAsterisk
-                accept="audio/*"
+                accept="audio/*,video/*"
                 {...form.getInputProps('audioFile')}
               />
             )}
@@ -308,7 +308,7 @@ export default function AdvancedForm({ recordings, zoomToken }: { recordings: Zo
                       size="lg"
                       value={bitrate}
                       onChange={setBitrate}
-                      defaultValue={25}
+                      defaultValue={37.5}
                       label={(val) => BITRATE_OPTIONS.find((opt) => opt.value === val)!.label}
                       step={12.5}
                       marks={BITRATE_OPTIONS}
