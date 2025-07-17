@@ -34,7 +34,7 @@ export default function AdvancedForm({ recordings, zoomToken }: { recordings: Zo
   const [output, setOutput] = useState('telegram');
   const [group, setGroup] = useState<string>(TELEGRAM_SHEAF_YARD_GROUP_ID);
   const [filters, setFilters] = useState('default');
-  const [volumeBoost, setVolumeBoost] = useState(1.6);
+  const [volumeBoost, setVolumeBoost] = useState(1.5);
   const [bitrate, setBitrate] = useState(37.5);
   const [frequency, setFrequency] = useState(100);
   const [appState, setAppState] = useState(APP_STATES.INIT);
@@ -291,7 +291,7 @@ export default function AdvancedForm({ recordings, zoomToken }: { recordings: Zo
                       size="lg"
                       value={volumeBoost}
                       onChange={setVolumeBoost}
-                      defaultValue={1.6}
+                      defaultValue={1.5}
                       min={1.0}
                       max={3.0}
                       step={0.1}
