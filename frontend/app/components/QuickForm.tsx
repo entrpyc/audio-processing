@@ -15,26 +15,24 @@ import {
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { ZoomRecording } from '../types/types';
-import { APP_STATES, TELEGRAM_GROUPS, TELEGRAM_SHEAF_YARD_GROUP_ID } from '../utils/config';
+import { APP_STATES, TELEGRAM_GROUPS, TELEGRAM_SHEAF_YARD_2_GROUP_ID, TELEGRAM_SHEAF_YARD_GROUP_ID } from '../utils/config';
 import { handleZoomRecordingUpload } from '../utils/requests';
 import { getStorage, setStorage, STORAGE_KEYS } from '../utils/storage';
 import RecordingsList from './RecordingsList';
-import { useRecordings } from '../hooks/useRecordings';
+import { useZoomData } from '../hooks/useZoomData';
+import { useAudioSubmission } from '../hooks/useAudioSubmission';
 
-export default function QuickForm({
-  recordings,
-  zoomToken,
-  handleZoomRecordings,
-}: {
-  recordings: ZoomRecording[],
-  handleZoomRecordings: () => Promise<boolean>,
-  zoomToken: string | undefined,
-}) {
-  const { setRecordings } = useRecordings();
+export default function QuickForm() {
+  const {
+    zoomToken,
+    handleFetchZoomRecordings,
+    recordings,
+  } = useZoomData();
+
+  const { selectedRecording, handleSelectRecording } = useAudioSubmission();
 
   const [status, setStatus] = useState('');
-  const [selectedRecording, setSelectedRecording] = useState<ZoomRecording>();
-  const [group, setGroup] = useState<string>(TELEGRAM_SHEAF_YARD_GROUP_ID);
+  const [group, setGroup] = useState<string>(TELEGRAM_SHEAF_YARD_2_GROUP_ID);
   const [appState, setAppState] = useState(APP_STATES.INIT);
   const [appErrorState, setAppErrorState] = useState<boolean>(false);
   const [fetchRecordingsButtonEnabled, setFetchRecordingsButtonEnabled] = useState(true);
@@ -107,23 +105,14 @@ export default function QuickForm({
 
   const handleFetchOlderZoomRecordings = async () => {
     setFetchRecordingsLoading(true);
-    await handleZoomRecordings();
+    await handleFetchZoomRecordings();
     setFetchRecordingsButtonEnabled(false);
-    setStorage(STORAGE_KEYS.FETCHED_ALL_ZOOM_RECORDINGS, 'true');
+    setStorage(STORAGE_KEYS.FETCHED_ALL_ZOOM_RECORDINGS, true);
     setFetchRecordingsLoading(false);
   }
 
-  const handleSelectRecording = (recording: ZoomRecording) => {
-    setRecordings(recordings => recordings.map(rec => ({
-      ...rec,
-      selected: rec.id === recording.id
-    })));
-
-    setSelectedRecording(recording)
-  }
-
   useEffect(() => {
-    setSelectedRecording(recordings[0])
+    handleSelectRecording(recordings[0])
   }, [recordings])
 
   useEffect(() => {
@@ -139,7 +128,7 @@ export default function QuickForm({
 
   useEffect(() => {
     setFetchRecordingsButtonEnabled(
-      !JSON.parse(getStorage(STORAGE_KEYS.FETCHED_ALL_ZOOM_RECORDINGS) ?? 'false')
+      getStorage(STORAGE_KEYS.FETCHED_ALL_ZOOM_RECORDINGS, false)
     )
   }, [])
 
@@ -175,6 +164,7 @@ export default function QuickForm({
               disabled={!recordings.length}
               recordings={recordings}
               loading={!recordings.length}
+              selectedRecording={selectedRecording}
             />
             {Boolean(fetchRecordingsButtonEnabled && recordings.length) && (
               !fetchRecordingsLoading ? (

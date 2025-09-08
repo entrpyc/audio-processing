@@ -4,8 +4,10 @@ export const ZOOM_RECORDINGS_ENDPOINT = 'https://audio-processing.indepthwebsolu
 export const TELEGRAM_OIL_OF_GLADNESS_ID = '-1002286427385';
 export const TELEGRAM_SHEAF_YARD_GROUP_ID = '-1001388987517';
 export const TELEGRAM_RECORDINGS_GROUP_ID = '-1002853673929';
+export const TELEGRAM_SHEAF_YARD_2_GROUP_ID = '-1002885070590';
 
 export const TELEGRAM_GROUPS = [
+  { value: TELEGRAM_SHEAF_YARD_2_GROUP_ID, label: 'Sheaf Yard 2' },
   { value: TELEGRAM_SHEAF_YARD_GROUP_ID, label: 'Sheaf Yard' },
   { value: TELEGRAM_OIL_OF_GLADNESS_ID, label: 'Oil of Gladness' },
   { value: TELEGRAM_RECORDINGS_GROUP_ID, label: 'Audio Recordings' },

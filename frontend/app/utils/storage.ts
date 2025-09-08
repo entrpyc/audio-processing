@@ -6,10 +6,19 @@ export enum STORAGE_KEYS {
   FETCHED_ALL_ZOOM_RECORDINGS = 'FETCHED_ALL_ZOOM_RECORDINGS',
 }
 
-export const getStorage = (key: STORAGE_KEYS) => {
-  return localStorage.getItem(key);
+export const getStorage = (key: STORAGE_KEYS, fallback?: any) => {
+  const storageValue = localStorage.getItem(key);
+  let parsedValue = null;
+
+  try {
+    parsedValue = JSON.parse(storageValue ?? fallback ?? 'null')
+  } catch {
+    parsedValue = storageValue;
+  }
+
+  return parsedValue;
 }
 
-export const setStorage = (key: STORAGE_KEYS, value: string) => {
-  return localStorage.setItem(key, value);
+export const setStorage = (key: STORAGE_KEYS, value: any) => {
+  return localStorage.setItem(key, JSON.stringify(value));
 }

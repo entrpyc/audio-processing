@@ -7,6 +7,7 @@ type RecordingListProps = {
   onRecordingClick?: (recording: ZoomRecording) => void,
   recordings?: ZoomRecording[],
   disabled?: boolean,
+  selectedRecording: ZoomRecording | undefined,
 }
 
 export default function RecordingsList ({
@@ -14,6 +15,7 @@ export default function RecordingsList ({
   onRecordingClick,
   recordings,
   disabled,
+  selectedRecording
 }: RecordingListProps) {
   if(loading) return (
     <Flex justify="center" align="center">
@@ -31,7 +33,7 @@ export default function RecordingsList ({
     <Stack gap={10}>
       {recordings?.map(item => (
         <Card
-          className={`${css.cardHover} ${item.selected && css.cardSelected} ${disabled && css.disabled}`}
+          className={`${css.cardHover} ${item.id === selectedRecording?.id && css.cardSelected} ${disabled && css.disabled}`}
           key={item.id}
           shadow="sm"
           padding="lg"
@@ -39,7 +41,7 @@ export default function RecordingsList ({
           withBorder
           onClick={() => onRecordingClick?.(item)}
         >
-          <Text c="dimmed">{item.selected ? '✅' : '🎬'} {item.date}{item.selected ? ' (selected)' : ''}</Text>
+          <Text c="dimmed">{item.id === selectedRecording?.id ? '✅' : '🎬'} {item.date}{item.id === selectedRecording?.id ? ' (selected)' : ''}</Text>
         </Card>
       ))}
     </Stack>

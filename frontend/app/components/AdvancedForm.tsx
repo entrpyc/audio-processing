@@ -26,8 +26,11 @@ import { ZoomRecording } from '../types/types';
 import css from '../style/styles.module.css';
 import { APP_STATES, BITRATE_OPTIONS, FREQUENCY_OPTIONS, TELEGRAM_GROUPS, TELEGRAM_SHEAF_YARD_GROUP_ID } from '../utils/config';
 import { handleFileUpload, handleZoomRecordingUpload } from '../utils/requests';
+import { useZoomData } from '../hooks/useZoomData';
 
-export default function AdvancedForm({ recordings, zoomToken }: { recordings: ZoomRecording[], zoomToken: string | undefined }) {
+export default function AdvancedForm() {
+  const { zoomToken, recordings } = useZoomData();
+  
   const [status, setStatus] = useState('');
   const [source, setSource] = useState('zoom-cloud');
   const [selectedRecording, setSelectedRecording] = useState<ZoomRecording>();
