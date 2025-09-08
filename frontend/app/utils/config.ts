@@ -1,16 +1,18 @@
 export const ZOOM_TOKEN_ENDPOINT = 'https://audio-processing.indepthwebsolutions.com/api/zoom-token';
 export const ZOOM_RECORDINGS_ENDPOINT = 'https://audio-processing.indepthwebsolutions.com/api/recordings';
 
-export const TELEGRAM_OIL_OF_GLADNESS_ID = '-1002286427385';
-export const TELEGRAM_SHEAF_YARD_GROUP_ID = '-1001388987517';
-export const TELEGRAM_RECORDINGS_GROUP_ID = '-1002853673929';
-export const TELEGRAM_SHEAF_YARD_2_GROUP_ID = '-1002885070590';
+export type TelegramGroupType = { id: string, label: string };
+
+export const TELEGRAM_SHEAF_YARD_2_GROUP = { id: '-1002885070590', label: 'Sheaf Yard 2' };
+export const TELEGRAM_OIL_OF_GLADNESS = { id: '-1002286427385', label: 'Oil of Gladness' };
+export const TELEGRAM_SHEAF_YARD_GROUP = { id: '-1001388987517', label: 'Sheaf Yard' };
+export const TELEGRAM_RECORDINGS_GROUP = { id: '-1002853673929', label: 'Audio Recordings' };
 
 export const TELEGRAM_GROUPS = [
-  { value: TELEGRAM_SHEAF_YARD_2_GROUP_ID, label: 'Sheaf Yard 2' },
-  { value: TELEGRAM_SHEAF_YARD_GROUP_ID, label: 'Sheaf Yard' },
-  { value: TELEGRAM_OIL_OF_GLADNESS_ID, label: 'Oil of Gladness' },
-  { value: TELEGRAM_RECORDINGS_GROUP_ID, label: 'Audio Recordings' },
+  TELEGRAM_SHEAF_YARD_2_GROUP,
+  TELEGRAM_OIL_OF_GLADNESS,
+  TELEGRAM_SHEAF_YARD_GROUP,
+  TELEGRAM_RECORDINGS_GROUP,
 ]
 
 export const APP_STATES = {

@@ -24,18 +24,19 @@ import { notifications } from '@mantine/notifications';
 import { capitalize, downloadFile, formatDate, formatTitle } from '../utils/helpers';
 import { ZoomRecording } from '../types/types';
 import css from '../style/styles.module.css';
-import { APP_STATES, BITRATE_OPTIONS, FREQUENCY_OPTIONS, TELEGRAM_GROUPS, TELEGRAM_SHEAF_YARD_GROUP_ID } from '../utils/config';
+import { APP_STATES, BITRATE_OPTIONS, FREQUENCY_OPTIONS, TELEGRAM_GROUPS } from '../utils/config';
 import { handleFileUpload, handleZoomRecordingUpload } from '../utils/requests';
 import { useZoomData } from '../hooks/useZoomData';
+import { useAudioSubmission } from '../hooks/useAudioSubmission';
 
 export default function AdvancedForm() {
   const { zoomToken, recordings } = useZoomData();
-  
+  const { selectedGroup, handleSelectGroup } = useAudioSubmission();
+
   const [status, setStatus] = useState('');
   const [source, setSource] = useState('zoom-cloud');
   const [selectedRecording, setSelectedRecording] = useState<ZoomRecording>();
   const [output, setOutput] = useState('telegram');
-  const [group, setGroup] = useState<string>(TELEGRAM_SHEAF_YARD_GROUP_ID);
   const [filters, setFilters] = useState('default');
   const [volumeBoost, setVolumeBoost] = useState(1.5);
   const [bitrate, setBitrate] = useState(37.5);
@@ -89,7 +90,7 @@ export default function AdvancedForm() {
         title: form.values.title,
         date: selectedDate,
         sendToTelegram: output === 'download' ? false : true,
-        groupId: group,
+        groupId: selectedGroup.id,
         normalization: volumeBoost.toString(),
         bitrate: bitrateSubmitValue?.toString(),
         frequency: frequencySubmitValue?.toString(),
@@ -101,7 +102,7 @@ export default function AdvancedForm() {
         downloadUrl: selectedRecording?.downloadUrl,
         zoomToken,
         sendToTelegram: output === 'download' ? false : true,
-        groupId: group,
+        groupId: selectedGroup.id,
         normalization: volumeBoost.toString(),
         bitrate: bitrateSubmitValue?.toString(),
         frequency: frequencySubmitValue?.toString(),
@@ -131,10 +132,6 @@ export default function AdvancedForm() {
     } finally {
       setAppState(APP_STATES.COMPLETED);
     }
-  };
-
-  const handleGroupClick = (val: string | null) => {
-    if (val && val !== group) setGroup(val);
   };
 
   useEffect(() => {
@@ -254,9 +251,9 @@ export default function AdvancedForm() {
                   disabled={appState !== APP_STATES.INIT}
                   label="Select a Telegram group"
                   placeholder="Pick one"
-                  data={TELEGRAM_GROUPS}
-                  value={group}
-                  onChange={handleGroupClick}
+                  data={TELEGRAM_GROUPS.map(g => ({ ...g, value: g.id }))}
+                  value={selectedGroup.id}
+                  onChange={handleSelectGroup}
                 />
               ) : (
                 <Text>The recording will be downloaded after its processed.</Text>
@@ -341,7 +338,7 @@ export default function AdvancedForm() {
           <Text><strong>Title:</strong> {capitalize(form.getValues().title || '-')}</Text>
           <Text><strong>Date:</strong> {source === 'zoom-cloud' && !selectedRecording?.date ? '-' : selectedDate ? formatDate(selectedDate) : '-'}</Text>
           <Text><strong>Source:</strong> {source === 'zoom-cloud' ? `Cloud recording from ${selectedRecording?.date ?? '-'}` : `Uploaded file "${form.getValues().audioFile?.name || '-'}"`}</Text>
-          <Text><strong>Output:</strong> {output === 'download' ? 'Download to this device' : TELEGRAM_GROUPS.find(g => g.value === group)?.label}</Text>
+          <Text><strong>Output:</strong> {output === 'download' ? 'Download to this device' : TELEGRAM_GROUPS.find(g => g.id === selectedGroup.id)?.label}</Text>
           <Text><strong>Filters:</strong> {(filters === 'default' && 'Default filters') || (filters === 'no-filters' && 'No filters') || `Volume boost - ${volumeBoost}, Bitrate - ${BITRATE_OPTIONS.find(v => v.value === bitrate)?.label}, Frequency - ${FREQUENCY_OPTIONS.find(v => v.value === frequency)?.label}`}</Text>
           <Divider my={20} />
           {appState === APP_STATES.INIT && (

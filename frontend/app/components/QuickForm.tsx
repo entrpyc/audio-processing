@@ -14,8 +14,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { ZoomRecording } from '../types/types';
-import { APP_STATES, TELEGRAM_GROUPS, TELEGRAM_SHEAF_YARD_2_GROUP_ID, TELEGRAM_SHEAF_YARD_GROUP_ID } from '../utils/config';
+import { APP_STATES, TELEGRAM_GROUPS } from '../utils/config';
 import { handleZoomRecordingUpload } from '../utils/requests';
 import { getStorage, setStorage, STORAGE_KEYS } from '../utils/storage';
 import RecordingsList from './RecordingsList';
@@ -29,10 +28,14 @@ export default function QuickForm() {
     recordings,
   } = useZoomData();
 
-  const { selectedRecording, handleSelectRecording } = useAudioSubmission();
+  const {
+    selectedRecording,
+    handleSelectRecording,
+    selectedGroup,
+    handleSelectGroup
+  } = useAudioSubmission();
 
   const [status, setStatus] = useState('');
-  const [group, setGroup] = useState<string>(TELEGRAM_SHEAF_YARD_2_GROUP_ID);
   const [appState, setAppState] = useState(APP_STATES.INIT);
   const [appErrorState, setAppErrorState] = useState<boolean>(false);
   const [fetchRecordingsButtonEnabled, setFetchRecordingsButtonEnabled] = useState(true);
@@ -77,7 +80,7 @@ export default function QuickForm() {
         title: form.values.title,
         date: selectedDate,
         downloadUrl: selectedRecording?.downloadUrl,
-        groupId: group,
+        groupId: selectedGroup.id,
         zoomToken,
         sendToTelegram: true,
       });
@@ -97,10 +100,6 @@ export default function QuickForm() {
     } finally {
       setAppState(APP_STATES.COMPLETED);
     }
-  };
-
-  const handleGroupClick = (val: string | null) => {
-    if (val && val !== group) setGroup(val);
   };
 
   const handleFetchOlderZoomRecordings = async () => {
@@ -186,9 +185,9 @@ export default function QuickForm() {
                 disabled={appState !== APP_STATES.INIT}
                 label="Select a Telegram group"
                 placeholder="Pick one"
-                data={TELEGRAM_GROUPS}
-                value={group}
-                onChange={handleGroupClick}
+                data={TELEGRAM_GROUPS.map(g => ({ ...g, value: g.id }))}
+                value={selectedGroup.id}
+                onChange={handleSelectGroup}
               />
             </Stack>
           </Stack>
