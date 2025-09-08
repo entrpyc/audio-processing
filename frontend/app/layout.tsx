@@ -4,8 +4,8 @@ import '@mantine/notifications/styles.css';
 
 import { Container, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import { ZoomDataProvider } from './contexts/ZoomDataContext';
-import { AudioSubmissionProvider } from './contexts/AudioSubmissionContext';
+import { ZoomDataProvider } from '../contexts/ZoomDataContext';
+import { AudioSubmissionProvider } from '../contexts/AudioSubmissionContext';
 
 export const metadata = {
   title: 'Audio Processing',
@@ -27,9 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ZoomDataProvider>
               <AudioSubmissionProvider>
                 <Notifications />
-                <Container p={40}>
-                  {children}
-                </Container>
+                {children}
               </AudioSubmissionProvider>
             </ZoomDataProvider>
           </MantineProvider>

@@ -1,10 +1,10 @@
 'use client'
 
-import { SegmentedControl, Stack, Title } from '@mantine/core';
+import { AppShell, Container, SegmentedControl, Stack, Title } from '@mantine/core';
 import { useEffect, useState } from 'react';
-import AdvancedForm from './components/AdvancedForm';
-import QuickForm from './components/QuickForm';
-import { useZoomData } from './hooks/useZoomData';
+import AdvancedForm from '../components/AdvancedForm';
+import QuickForm from '../components/QuickForm';
+import { useZoomData } from '../hooks/useZoomData';
 
 enum TABS {
   QUICK = 'QUICK',
@@ -29,24 +29,36 @@ export default function Home() {
   }, [zoomToken]);
 
   return (
-    <Stack gap={20}>
-      <Title order={1}>Audio Processing</Title>
-      <SegmentedControl
-        mt={40}
-        fullWidth
-        size="lg"
-        value={activeTab}
-        onChange={v => setActiveTab(v as TABS)}
-        data={[
-          { label: 'Quick Submission', value: TABS.QUICK },
-          { label: 'Advanced Submission', value: TABS.ADVACNED },
-        ]}
-      />
-      {activeTab === TABS.QUICK ? (
-        <QuickForm />
-      ): (
-        <AdvancedForm />
-      )}
-    </Stack>
+    <AppShell
+      padding="xl"
+      navbar={{
+        width: 300,
+        breakpoint: 'sm',
+      }}
+    >      
+      <AppShell.Navbar>Navbar</AppShell.Navbar>
+      
+      <AppShell.Main>
+        <Container>
+          <Stack gap={20}>
+            <SegmentedControl
+              size="lg"
+              value={activeTab}
+              onChange={v => setActiveTab(v as TABS)}
+              data={[
+                { label: 'Quick Submission', value: TABS.QUICK },
+                { label: 'Advanced Submission', value: TABS.ADVACNED },
+              ]}
+            />
+            {activeTab === TABS.QUICK ? (
+              <QuickForm />
+            ): (
+              <AdvancedForm />
+            )}
+          </Stack>
+        </Container>
+      </AppShell.Main>
+    
+    </AppShell>
   );
 }
