@@ -9,7 +9,6 @@ const { FILE_SIZE_LIMIT, ROUTE } = require('./src/config/constants');
 const { handleServerError, handleRouteErrors } = require('./src/utils/errorHandling');
 const { log } = require('./src/utils/logger');
 const { setupServerFolders } = require('./src/utils/setup');
-const { cleanTempFiles } = require('./cron/cleanup');
 
 require('./cron/cleanup');
 require('dotenv').config();
@@ -17,7 +16,6 @@ require('dotenv').config();
 const app = express();
 
 setupServerFolders();
-cleanTempFiles();
 
 app.use(cors({ origin: '*' }));
 app.use(express.json({ limit: `${FILE_SIZE_LIMIT}mb` }));

@@ -4,6 +4,7 @@ const { Readable } = require('stream');
 const { pipeline } = require('stream/promises');
 const { writeAudio } = require('../utils/fileSystem');
 const { fetchZoomRecordings } = require('../utils/zoom');
+const { log } = require('../utils/logger');
 
 const getZoomAccessToken = async () => {
   const res = await fetch(ZOOM_AUTH_TOKEN_URL, {
@@ -25,18 +26,26 @@ const getZoomAccessToken = async () => {
   return data.access_token;
 };
 
-const getZoomRecordings = async ({ zoomToken }) => {
-  const recordings = await fetchZoomRecordings({ zoomToken })
+const sortZoomRecordingsByDate = (a, b) => new Date(b.dateRaw) - new Date(a.dateRaw)
 
-  const mappedRecordings = recordings.map(recording => ({
+const getZoomRecordings = async ({ zoomToken, range }) => {
+  const recordings = await fetchZoomRecordings({ zoomToken, range });
+
+  log('fetched', recordings)
+
+  const recordingsMapped = recordings.map(recording => (recording && {
     id: recording.id,
     date: formatDate(recording.start_time),
     dateRaw: recording.start_time.split('T')[0],
     shareUrl: recording.share_url,
-    downloadUrl: recording.recording_files.find(recording => recording.file_type === ZOOM_RECORDING_FILE_TYPE).download_url,
+    downloadUrl: recording.recording_files.find(recording => recording.file_type === ZOOM_RECORDING_FILE_TYPE)?.download_url,
   }))
 
-  return mappedRecordings;
+  const recordingsFiltered = recordingsMapped.filter(Boolean).filter(recording => recording.downloadUrl);
+
+  recordingsFiltered.sort(sortZoomRecordingsByDate);
+
+  return recordingsFiltered;
 }
 
 const downloadZoomRecording = async ({ downloadUrl, zoomToken }) => {

@@ -1,31 +1,11 @@
 const { ZOOM_RECORDINGS_URL } = require("../config/constants");
+const { currentMonthRange } = require("./constants");
 const { log, logError } = require("./logger");
 
-async function fetchZoomRecordings({ zoomToken }) {
-  const format = (d) => d.toISOString().split("T")[0];
+async function fetchZoomRecordings({ zoomToken, range }) {
+  const recordings = [];
 
-  const now = new Date();
-  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const previousMonthStart = new Date(currentMonthStart);
-  previousMonthStart.setMonth(previousMonthStart.getMonth() - 1);
-  const twoMonthsAgoStart = new Date(currentMonthStart);
-  twoMonthsAgoStart.setMonth(twoMonthsAgoStart.getMonth() - 2);
-
-  const twoMonthsAgoEnd = new Date(previousMonthStart);
-  twoMonthsAgoEnd.setDate(0);
-  const previousMonthEnd = new Date(currentMonthStart);
-  previousMonthEnd.setDate(0);
-  const currentMonthEnd = now;
-
-  const ranges = [
-    [format(twoMonthsAgoStart), format(twoMonthsAgoEnd)],
-    [format(previousMonthStart), format(previousMonthEnd)],
-    [format(currentMonthStart), format(currentMonthEnd)],
-  ];
-
-  const allRecordings = [];
-
-  for (const [from, to] of ranges) {
+  for (const [from, to] of [range || currentMonthRange]) {
     const url = new URL(ZOOM_RECORDINGS_URL);
     url.searchParams.set("from", from);
     url.searchParams.set("to", to);
@@ -48,11 +28,11 @@ async function fetchZoomRecordings({ zoomToken }) {
     }
     
     if (data?.meetings?.length) {
-      allRecordings.push(...data.meetings);
+      recordings.push(...data.meetings);
     }
   }
 
-  return allRecordings;
+  return recordings;
 }
 
 module.exports = {

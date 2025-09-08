@@ -1,5 +1,5 @@
 const ffmpeg = require('fluent-ffmpeg');
-const { log, logError } = require('./logger');
+const { logError } = require('./logger');
 
 const processAudio = ({
   inputPath,

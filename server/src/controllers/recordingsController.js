@@ -6,12 +6,12 @@ async function recordingsController(req, res) {
   if(!req?.body) return handleMissingRequestBody(req, res);
   log('recordingsController', req.body)
 
-  const { zoomToken } = req.body;
+  const { zoomToken, range } = req.body;
 
   const validParams = validateRequiredParams(res, { zoomToken })
   if(!validParams) return;
 
-  const recordings = await getZoomRecordings({ zoomToken });
+  const recordings = await getZoomRecordings({ zoomToken, range });
 
   log('res', recordings)
   return res.status(200).json({ recordings });
