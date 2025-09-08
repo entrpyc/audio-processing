@@ -4,4 +4,5 @@ export type ZoomRecording = {
   dateRaw: string;
   shareUrl: string;
   downloadUrl: string;
+  selected?: boolean;
 };

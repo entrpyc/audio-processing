@@ -4,29 +4,41 @@ import { useEffect, useState } from 'react';
 import { useRef } from 'react';
 import {
   Button,
-  Card,
   Flex,
   Loader,
   Paper,
   Select,
   Stack,
-  Text,
   TextInput,
   Title
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { ZoomRecording } from '../types/types';
-import css from '../style/styles.module.css';
 import { APP_STATES, TELEGRAM_GROUPS, TELEGRAM_SHEAF_YARD_GROUP_ID } from '../utils/config';
 import { handleZoomRecordingUpload } from '../utils/requests';
+import { getStorage, setStorage, STORAGE_KEYS } from '../utils/storage';
+import RecordingsList from './RecordingsList';
+import { useRecordings } from '../hooks/useRecordings';
 
-export default function QuickForm({ recordings, zoomToken }: { recordings: ZoomRecording[], zoomToken: string | undefined }) {
+export default function QuickForm({
+  recordings,
+  zoomToken,
+  handleZoomRecordings,
+}: {
+  recordings: ZoomRecording[],
+  handleZoomRecordings: () => Promise<boolean>,
+  zoomToken: string | undefined,
+}) {
+  const { setRecordings } = useRecordings();
+
   const [status, setStatus] = useState('');
   const [selectedRecording, setSelectedRecording] = useState<ZoomRecording>();
   const [group, setGroup] = useState<string>(TELEGRAM_SHEAF_YARD_GROUP_ID);
   const [appState, setAppState] = useState(APP_STATES.INIT);
   const [appErrorState, setAppErrorState] = useState<boolean>(false);
+  const [fetchRecordingsButtonEnabled, setFetchRecordingsButtonEnabled] = useState(true);
+  const [fetchRecordingsLoading, setFetchRecordingsLoading] = useState(false);
   
   const fieldRefs = {
     audioFile: useRef<HTMLInputElement>(null),
@@ -93,6 +105,23 @@ export default function QuickForm({ recordings, zoomToken }: { recordings: ZoomR
     if (val && val !== group) setGroup(val);
   };
 
+  const handleFetchOlderZoomRecordings = async () => {
+    setFetchRecordingsLoading(true);
+    await handleZoomRecordings();
+    setFetchRecordingsButtonEnabled(false);
+    setStorage(STORAGE_KEYS.FETCHED_ALL_ZOOM_RECORDINGS, 'true');
+    setFetchRecordingsLoading(false);
+  }
+
+  const handleSelectRecording = (recording: ZoomRecording) => {
+    setRecordings(recordings => recordings.map(rec => ({
+      ...rec,
+      selected: rec.id === recording.id
+    })));
+
+    setSelectedRecording(recording)
+  }
+
   useEffect(() => {
     setSelectedRecording(recordings[0])
   }, [recordings])
@@ -107,6 +136,12 @@ export default function QuickForm({ recordings, zoomToken }: { recordings: ZoomR
       message: status,
     })
   }, [status])
+
+  useEffect(() => {
+    setFetchRecordingsButtonEnabled(
+      !JSON.parse(getStorage(STORAGE_KEYS.FETCHED_ALL_ZOOM_RECORDINGS) ?? 'false')
+    )
+  }, [])
 
   return (
     <form
@@ -135,27 +170,21 @@ export default function QuickForm({ recordings, zoomToken }: { recordings: ZoomR
         <Paper shadow="md" withBorder p={20}>
           <Stack gap={30} ref={fieldRefs.audioFile}>
             <Title order={2}>Source</Title>
-            {!recordings.length ? (
+            <RecordingsList
+              onRecordingClick={handleSelectRecording}
+              disabled={!recordings.length}
+              recordings={recordings}
+              loading={!recordings.length}
+            />
+            {Boolean(fetchRecordingsButtonEnabled && recordings.length) && (
+              !fetchRecordingsLoading ? (
+                <Button variant="outline" color="gray" fullWidth onClick={handleFetchOlderZoomRecordings}>Get older recordings</Button>
+              ) : (
                 <Flex justify="center" align="center">
                   <Loader color="blue" />
                 </Flex>
-              ) : (
-                <Stack gap={10}>
-                  {recordings.map(item => (
-                    <Card
-                      className={`${css.cardHover} ${selectedRecording?.id === item.id && css.cardSelected} ${appState !== APP_STATES.INIT && css.disabled}`}
-                      key={item.id}
-                      shadow="sm"
-                      padding="lg"
-                      radius="md"
-                      withBorder
-                      onClick={() => setSelectedRecording(item)}
-                    >
-                      <Text c="dimmed">{selectedRecording?.id === item.id ? '✅' : '🎬'} {item.date}{selectedRecording?.id === item.id ? ' (selected)' : ''}</Text>
-                    </Card>
-                  ))}
-                </Stack>
-              )}
+              )
+            )}
           </Stack>
         </Paper>        
 

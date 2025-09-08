@@ -2,8 +2,9 @@ import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 
-import { MantineProvider } from '@mantine/core';
+import { Container, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
+import { RecordingsProvider } from './contexts/RecordingsContext';
 
 export const metadata = {
   title: 'Audio Processing',
@@ -14,16 +15,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <MantineProvider
-          defaultColorScheme="auto"
-          theme={{
-            fontFamily: 'sans-serif',
-            defaultRadius: 'sm',
-          }}
-        >
-            <Notifications />
-          {children}
-        </MantineProvider>
+        <main>
+          <MantineProvider
+            defaultColorScheme="auto"
+            theme={{
+              fontFamily: 'sans-serif',
+              defaultRadius: 'sm',
+            }}
+          >
+            <RecordingsProvider>
+              <Notifications />
+              <Container p={40}>
+                {children}
+              </Container>
+            </RecordingsProvider>
+          </MantineProvider>
+        </main>
       </body>
     </html>
   );
