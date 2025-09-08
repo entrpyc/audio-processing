@@ -43,3 +43,21 @@ export const downloadFile = async (res: Response, name: string) =>{
 export const capitalize = (value: string) => {
   return value.toLowerCase().charAt(0).toUpperCase() + value.slice(1)
 }
+
+const formatDateRange = (d: Date) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
+const now = new Date();
+
+const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+const currentMonthEnd   = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+const previousMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+const previousMonthEnd   = new Date(now.getFullYear(), now.getMonth(), 0);
+
+export const currentMonthRange  = [formatDateRange(currentMonthStart), formatDateRange(currentMonthEnd)];
+export const previousMonthRange = [formatDateRange(previousMonthStart), formatDateRange(previousMonthEnd)];

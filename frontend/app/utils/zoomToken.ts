@@ -13,6 +13,9 @@ export const fetchToken = async () => {
   if (data.error) return;
 
   setStorage(STORAGE_KEYS.ZOOM_ACCESS_TOKEN, data.zoomToken);
-  setStorage(STORAGE_KEYS.ZOOM_ACCESS_TOKEN_EXPIRY, (Date.now() + 10 * 60 * 1000).toString());
+  setStorage(STORAGE_KEYS.ZOOM_RECORDINGS, '[]');
+  setStorage(STORAGE_KEYS.ZOOM_ACCESS_TOKEN_EXPIRY, (Date.now() + 60000).toString());
+  setStorage(STORAGE_KEYS.FETCHED_ALL_ZOOM_RECORDINGS, 'false');
+
   return data.zoomToken;
 };
