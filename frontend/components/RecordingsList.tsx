@@ -1,6 +1,6 @@
 import { Card, Flex, Loader, Stack, Text } from "@mantine/core"
-import css from '../style/styles.module.css';
-import { ZoomRecording } from "../types/types";
+import css from '@/styles/global.module.css';
+import { ZoomRecording } from "@/types/types";
 
 type RecordingListProps = {
   loading?: boolean
