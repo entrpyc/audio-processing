@@ -46,8 +46,8 @@ export default function AdvancedForm() {
   const [appState, setAppState] = useState(APP_STATES.INIT);
   const [appErrorState, setAppErrorState] = useState<boolean>(false);
 
-  // Stepper
-  const [active, setActive] = useState(0); // 0..4
+  // Stepper index: 0..4 (4 = Submit/Review)
+  const [active, setActive] = useState(0);
 
   const fieldRefs = {
     audioFile: useRef<HTMLInputElement>(null),
@@ -114,7 +114,7 @@ export default function AdvancedForm() {
   const prev = () => setActive((s) => Math.max(s - 1, 0));
 
   const handleSubmit = async () => {
-    // Final guard across steps
+    // Validate all steps before submit
     for (let s = 0; s <= 3; s++) {
       if (!validateStep(s)) {
         setActive(s);
@@ -202,293 +202,323 @@ export default function AdvancedForm() {
     notifications.show({ title: 'Status', message: status });
   }, [status]);
 
+  // --- Step content renderers (now separate from Stepper UI) ---
+  const StepSource = (
+    <Stack gap={30} ref={fieldRefs.audioFile}>
+      <SegmentedControl
+        disabled={appState !== APP_STATES.INIT}
+        fullWidth
+        size="md"
+        value={source}
+        onChange={(val) => setSource(val as 'zoom-cloud' | 'upload')}
+        data={[
+          { label: '☁︎ Zoom Cloud', value: 'zoom-cloud' },
+          { label: '📁 Upload', value: 'upload' },
+        ]}
+      />
+
+      {source === 'zoom-cloud' ? (
+        !recordings.length ? (
+          <Flex justify="center" align="center">
+            <Loader />
+          </Flex>
+        ) : (
+          <Stack gap={10}>
+            {recordings.map((item) => (
+              <Card
+                className={`${css.cardHover} ${
+                  selectedRecording?.id === item.id && css.cardSelected
+                } ${appState !== APP_STATES.INIT && css.disabled}`}
+                key={item.id}
+                shadow="sm"
+                padding="lg"
+                radius="md"
+                withBorder
+                onClick={() => setSelectedRecording(item)}
+              >
+                <Text c="dimmed">
+                  {selectedRecording?.id === item.id ? '✅' : '🎬'} {item.date}
+                  {selectedRecording?.id === item.id ? ' (selected)' : ''}
+                </Text>
+              </Card>
+            ))}
+          </Stack>
+        )
+      ) : (
+        <FileInput
+          disabled={appState !== APP_STATES.INIT}
+          label="Audio File"
+          placeholder="Select a file"
+          withAsterisk
+          accept="audio/*,video/*"
+          key={form.key('audioFile')}
+          {...form.getInputProps('audioFile')}
+          error={form.errors.audioFile}
+        />
+      )}
+    </Stack>
+  );
+
+  const StepInfo = (
+    <Stack gap={20}>
+      <TextInput
+        disabled={appState !== APP_STATES.INIT}
+        label="Title"
+        ref={fieldRefs.title}
+        placeholder="What should be the title of this meeting?"
+        withAsterisk
+        key={form.key('title')}
+        {...form.getInputProps('title')}
+        error={form.errors.title}
+      />
+      {source === 'upload' && (
+        <DateInput
+          disabled={appState !== APP_STATES.INIT}
+          label="Date"
+          ref={fieldRefs.date}
+          placeholder="When was this meeting recorded?"
+          withAsterisk
+          valueFormat="YYYY-MM-DD"
+          key={form.key('date')}
+          {...form.getInputProps('date')}
+          error={form.errors.date}
+        />
+      )}
+    </Stack>
+  );
+
+  const StepOutput = (
+    <Stack gap={20}>
+      <SegmentedControl
+        disabled={appState !== APP_STATES.INIT}
+        value={output}
+        onChange={(v) => setOutput(v as 'telegram' | 'download')}
+        data={[
+          { label: 'Send to Telegram', value: 'telegram' },
+          { label: 'Download', value: 'download' },
+        ]}
+      />
+      {output === 'telegram' ? (
+        <Select
+          disabled={appState !== APP_STATES.INIT}
+          label="Select a Telegram group"
+          placeholder="Pick one"
+          data={TELEGRAM_GROUPS.map((g) => ({ ...g, value: g.id }))}
+          value={selectedGroup.id}
+          onChange={handleSelectGroup}
+          error={form.errors.output as string | undefined}
+        />
+      ) : (
+        <Text>The recording will be downloaded after it’s processed.</Text>
+      )}
+    </Stack>
+  );
+
+  const StepFilters = (
+    <Stack gap={24}>
+      <SegmentedControl
+        disabled={appState !== APP_STATES.INIT}
+        value={filters}
+        onChange={(v) => setFilters(v as typeof filters)}
+        data={[
+          { label: 'Use default settings', value: 'default' },
+          { label: 'No filters', value: 'no-filters' },
+          { label: 'Use custom settings', value: 'custom' },
+        ]}
+      />
+
+      {filters === 'default' && <Text>The default audio filters will be applied.</Text>}
+
+      {filters === 'no-filters' && <Text>No filters will be applied.</Text>}
+
+      {filters === 'custom' && (
+        <Stack gap={28}>
+          <Stack>
+            <Text size="sm">Volume boost</Text>
+            <Slider
+              disabled={appState !== APP_STATES.INIT}
+              size="lg"
+              value={volumeBoost}
+              onChange={setVolumeBoost}
+              min={1.0}
+              max={3.0}
+              step={0.1}
+              marks={[
+                { value: 1, label: '1.0' },
+                { value: 3, label: '3.0' },
+              ]}
+            />
+          </Stack>
+          <Stack>
+            <Text size="sm">Bitrate</Text>
+            <Slider
+              disabled={appState !== APP_STATES.INIT}
+              size="lg"
+              value={bitrate}
+              onChange={setBitrate}
+              label={(val) => BITRATE_OPTIONS.find((opt) => opt.value === val)!.label}
+              step={12.5}
+              marks={BITRATE_OPTIONS}
+            />
+          </Stack>
+          <Stack>
+            <Text size="sm">Frequency</Text>
+            <Slider
+              disabled={appState !== APP_STATES.INIT}
+              size="lg"
+              value={frequency}
+              onChange={setFrequency}
+              label={(val) => FREQUENCY_OPTIONS.find((opt) => opt.value === val)!.label}
+              step={25}
+              marks={FREQUENCY_OPTIONS}
+            />
+          </Stack>
+        </Stack>
+      )}
+    </Stack>
+  );
+
+  const StepSubmit = (
+    <Stack gap={16}>
+      <Title order={3}>Confirm and Upload</Title>
+
+      <Text>
+        <strong>Title:</strong> {capitalize(form.getValues().title || '-')}
+      </Text>
+      <Text>
+        <strong>Date:</strong>{' '}
+        {source === 'zoom-cloud' && !selectedRecording?.date
+          ? '-'
+          : selectedDate
+          ? formatDate(selectedDate)
+          : '-'}
+      </Text>
+      <Text>
+        <strong>Source:</strong>{' '}
+        {source === 'zoom-cloud'
+          ? `Cloud recording from ${selectedRecording?.date ?? '-'}`
+          : `Uploaded file "${form.getValues().audioFile?.name || '-'}"`}
+      </Text>
+      <Text>
+        <strong>Output:</strong>{' '}
+        {output === 'download'
+          ? 'Download to this device'
+          : TELEGRAM_GROUPS.find((g) => g.id === selectedGroup.id)?.label}
+      </Text>
+      <Text>
+        <strong>Filters:</strong>{' '}
+        {(filters === 'default' && 'Default filters') ||
+          (filters === 'no-filters' && 'No filters') ||
+          `Volume boost - ${volumeBoost}, Bitrate - ${
+            BITRATE_OPTIONS.find((v) => v.value === bitrate)?.label
+          }, Frequency - ${FREQUENCY_OPTIONS.find((v) => v.value === frequency)?.label}`}
+      </Text>
+
+      <Divider my={10} />
+
+      <Flex justify="center" align="center">
+        {appState === APP_STATES.INIT && (
+          <Button type="submit" fullWidth disabled={!zoomToken}>Submit</Button>
+        )}
+
+        {appState === APP_STATES.STARTED && (
+          <Loader />
+        )}
+
+        {appState === APP_STATES.COMPLETED && (
+          <Button fullWidth color="gray" onClick={() => {
+            setAppState(APP_STATES.INIT);
+            setActive(0);
+          }}>
+            {appErrorState
+              ? '❌ There was an error. Try again?'
+              : '✅ Completed! Start a new submission?'}
+          </Button>
+        )}
+      </Flex>
+    </Stack>
+  );
+
+  const renderStepContent = () => {
+    switch (active) {
+      case 0:
+        return StepSource;
+      case 1:
+        return StepInfo;
+      case 2:
+        return StepOutput;
+      case 3:
+        return StepFilters;
+      case 4:
+        return StepSubmit;
+      default:
+        return null;
+    }
+  };
+
+  const renderTopActions = () => {
+    // Actions bar lives at the TOP of the form Paper
+    if (appState === APP_STATES.STARTED) {
+      return (
+        <Group justify="space-between">
+          <div />
+          <Loader size="sm" />
+        </Group>
+      );
+    }
+
+    return (
+      <Group justify="space-between">
+        <Button variant="light" onClick={prev} disabled={active === 0 || appState !== APP_STATES.INIT}>
+          Back
+        </Button>
+
+        {active < 4 ? (
+          <Button onClick={next} disabled={appState !== APP_STATES.INIT}>
+            Next
+          </Button>
+        ) : (
+          <div />
+        )}
+      </Group>
+    );
+  };
+
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleSubmit();
-      }}
-    >
-      <Stack gap={30}>
+    <Stack gap={30}>
+      {/* 1) NAVIGATION ONLY — separate Paper above the form */}
+      <Paper shadow="md" withBorder p={20}>
+        <Stepper
+          active={active}
+          onStepClick={(i) => i <= active && setActive(i)}
+          size="sm"
+          allowNextStepsSelect={false}
+        >
+          <Stepper.Step label="Source" description="Cloud or upload" />
+          <Stepper.Step label="Info" description="Title & date" />
+          <Stepper.Step label="Output" description="Destination" />
+          <Stepper.Step label="Filters" description="Audio settings" />
+          <Stepper.Step label="Submit" description="Review & send" />
+        </Stepper>
+      </Paper>
+
+      {/* 2) FORM — buttons are on TOP inside this Paper */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (active === 4) handleSubmit();
+          else next();
+        }}
+      >
         <Paper shadow="md" withBorder p={20}>
-          <Stepper
-            active={active}
-            onStepClick={(i) => i <= active && setActive(i)} // prevent jumping forward
-            size="sm"
-          >
-            {/* STEP 0: SOURCE */}
-            <Stepper.Step label="Source" description="Cloud or upload">
-              <Stack gap={30} ref={fieldRefs.audioFile}>
-                <SegmentedControl
-                  disabled={appState !== APP_STATES.INIT}
-                  fullWidth
-                  size="md"
-                  value={source}
-                  onChange={(val) => setSource(val as 'zoom-cloud' | 'upload')}
-                  data={[
-                    { label: '☁︎ Zoom Cloud', value: 'zoom-cloud' },
-                    { label: '📁 Upload', value: 'upload' },
-                  ]}
-                />
+          {/* Top action bar */}
+          {renderTopActions()}
+          <Divider my="md" />
 
-                {source === 'zoom-cloud' ? (
-                  !recordings.length ? (
-                    <Flex justify="center" align="center">
-                      <Loader />
-                    </Flex>
-                  ) : (
-                    <Stack gap={10}>
-                      {recordings.map((item) => (
-                        <Card
-                          className={`${css.cardHover} ${
-                            selectedRecording?.id === item.id && css.cardSelected
-                          } ${appState !== APP_STATES.INIT && css.disabled}`}
-                          key={item.id}
-                          shadow="sm"
-                          padding="lg"
-                          radius="md"
-                          withBorder
-                          onClick={() => setSelectedRecording(item)}
-                        >
-                          <Text c="dimmed">
-                            {selectedRecording?.id === item.id ? '✅' : '🎬'} {item.date}
-                            {selectedRecording?.id === item.id ? ' (selected)' : ''}
-                          </Text>
-                        </Card>
-                      ))}
-                    </Stack>
-                  )
-                ) : (
-                  <FileInput
-                    disabled={appState !== APP_STATES.INIT}
-                    label="Audio File"
-                    placeholder="Select a file"
-                    withAsterisk
-                    accept="audio/*,video/*"
-                    key={form.key('audioFile')}
-                    {...form.getInputProps('audioFile')}
-                    error={form.errors.audioFile}
-                  />
-                )}
-              </Stack>
-
-              <Group justify="space-between" mt="lg">
-                <div />
-                <Button onClick={next}>Next</Button>
-              </Group>
-            </Stepper.Step>
-
-            {/* STEP 1: RECORDING INFO */}
-            <Stepper.Step label="Info" description="Title & date">
-              <Stack gap={20}>
-                <TextInput
-                  disabled={appState !== APP_STATES.INIT}
-                  label="Title"
-                  ref={fieldRefs.title}
-                  placeholder="What should be the title of this meeting?"
-                  withAsterisk
-                  key={form.key('title')}
-                  {...form.getInputProps('title')}
-                  error={form.errors.title}
-                />
-                {source === 'upload' && (
-                  <DateInput
-                    disabled={appState !== APP_STATES.INIT}
-                    label="Date"
-                    ref={fieldRefs.date}
-                    placeholder="When was this meeting recorded?"
-                    withAsterisk
-                    valueFormat="YYYY-MM-DD"
-                    key={form.key('date')}
-                    {...form.getInputProps('date')}
-                    error={form.errors.date}
-                  />
-                )}
-              </Stack>
-
-              <Group justify="space-between" mt="lg">
-                <Button variant="light" onClick={prev}>
-                  Back
-                </Button>
-                <Button onClick={next}>Next</Button>
-              </Group>
-            </Stepper.Step>
-
-            {/* STEP 2: OUTPUT */}
-            <Stepper.Step label="Output" description="Destination">
-              <Stack gap={20}>
-                <SegmentedControl
-                  disabled={appState !== APP_STATES.INIT}
-                  value={output}
-                  onChange={(v) => setOutput(v as 'telegram' | 'download')}
-                  data={[
-                    { label: 'Send to Telegram', value: 'telegram' },
-                    { label: 'Download', value: 'download' },
-                  ]}
-                />
-                {output === 'telegram' ? (
-                  <Select
-                    disabled={appState !== APP_STATES.INIT}
-                    label="Select a Telegram group"
-                    placeholder="Pick one"
-                    data={TELEGRAM_GROUPS.map((g) => ({ ...g, value: g.id }))}
-                    value={selectedGroup.id}
-                    onChange={handleSelectGroup}
-                    error={form.errors.output as string | undefined}
-                  />
-                ) : (
-                  <Text>The recording will be downloaded after it’s processed.</Text>
-                )}
-              </Stack>
-
-              <Group justify="space-between" mt="lg">
-                <Button variant="light" onClick={prev}>
-                  Back
-                </Button>
-                <Button onClick={next}>Next</Button>
-              </Group>
-            </Stepper.Step>
-
-            {/* STEP 3: AUDIO FILTERS */}
-            <Stepper.Step label="Filters" description="Audio settings">
-              <Stack gap={24}>
-                <SegmentedControl
-                  disabled={appState !== APP_STATES.INIT}
-                  value={filters}
-                  onChange={(v) => setFilters(v as typeof filters)}
-                  data={[
-                    { label: 'Use default settings', value: 'default' },
-                    { label: 'No filters', value: 'no-filters' },
-                    { label: 'Use custom settings', value: 'custom' },
-                  ]}
-                />
-
-                {filters === 'default' && <Text>The default audio filters will be applied.</Text>}
-
-                {filters === 'no-filters' && <Text>No filters will be applied.</Text>}
-
-                {filters === 'custom' && (
-                  <Stack gap={28}>
-                    <Stack>
-                      <Text size="sm">Volume boost</Text>
-                      <Slider
-                        disabled={appState !== APP_STATES.INIT}
-                        size="lg"
-                        value={volumeBoost}
-                        onChange={setVolumeBoost}
-                        min={1.0}
-                        max={3.0}
-                        step={0.1}
-                        marks={[
-                          { value: 1, label: '1.0' },
-                          { value: 3, label: '3.0' },
-                        ]}
-                      />
-                    </Stack>
-                    <Stack>
-                      <Text size="sm">Bitrate</Text>
-                      <Slider
-                        disabled={appState !== APP_STATES.INIT}
-                        size="lg"
-                        value={bitrate}
-                        onChange={setBitrate}
-                        label={(val) => BITRATE_OPTIONS.find((opt) => opt.value === val)!.label}
-                        step={12.5}
-                        marks={BITRATE_OPTIONS}
-                      />
-                    </Stack>
-                    <Stack>
-                      <Text size="sm">Frequency</Text>
-                      <Slider
-                        disabled={appState !== APP_STATES.INIT}
-                        size="lg"
-                        value={frequency}
-                        onChange={setFrequency}
-                        label={(val) => FREQUENCY_OPTIONS.find((opt) => opt.value === val)!.label}
-                        step={25}
-                        marks={FREQUENCY_OPTIONS}
-                      />
-                    </Stack>
-                  </Stack>
-                )}
-              </Stack>
-
-              <Group justify="space-between" mt="lg">
-                <Button variant="light" onClick={prev}>
-                  Back
-                </Button>
-                <Button onClick={next}>Next</Button>
-              </Group>
-            </Stepper.Step>
-
-            {/* STEP 4: SUBMIT (final visible step) */}
-            <Stepper.Step label="Submit" description="Review & send">
-              <Stack gap={16}>
-                <Title order={3}>Confirm and Upload</Title>
-
-                <Text>
-                  <strong>Title:</strong> {capitalize(form.getValues().title || '-')}
-                </Text>
-                <Text>
-                  <strong>Date:</strong>{' '}
-                  {source === 'zoom-cloud' && !selectedRecording?.date
-                    ? '-'
-                    : selectedDate
-                    ? formatDate(selectedDate)
-                    : '-'}
-                </Text>
-                <Text>
-                  <strong>Source:</strong>{' '}
-                  {source === 'zoom-cloud'
-                    ? `Cloud recording from ${selectedRecording?.date ?? '-'}`
-                    : `Uploaded file "${form.getValues().audioFile?.name || '-'}"`}
-                </Text>
-                <Text>
-                  <strong>Output:</strong>{' '}
-                  {output === 'download'
-                    ? 'Download to this device'
-                    : TELEGRAM_GROUPS.find((g) => g.id === selectedGroup.id)?.label}
-                </Text>
-                <Text>
-                  <strong>Filters:</strong>{' '}
-                  {(filters === 'default' && 'Default filters') ||
-                    (filters === 'no-filters' && 'No filters') ||
-                    `Volume boost - ${volumeBoost}, Bitrate - ${
-                      BITRATE_OPTIONS.find((v) => v.value === bitrate)?.label
-                    }, Frequency - ${FREQUENCY_OPTIONS.find((v) => v.value === frequency)?.label}`}
-                </Text>
-
-                <Divider my={10} />
-
-                {appState === APP_STATES.INIT && (
-                  <Group justify="space-between" mt="sm">
-                    <Button variant="light" onClick={prev}>
-                      Back
-                    </Button>
-                    <Button type="submit" disabled={!zoomToken} onClick={handleSubmit}>
-                      Submit
-                    </Button>
-                  </Group>
-                )}
-
-                {appState === APP_STATES.STARTED && (
-                  <Flex justify="center" align="center" mt="md">
-                    <Loader />
-                  </Flex>
-                )}
-
-                {appState === APP_STATES.COMPLETED && (
-                  <Button fullWidth color="gray" onClick={() => setAppState(APP_STATES.INIT)}>
-                    {appErrorState
-                      ? '❌ There was an error. Try again?'
-                      : '✅ Completed! Start a new submission?'}
-                  </Button>
-                )}
-              </Stack>
-            </Stepper.Step>
-          </Stepper>
+          {/* Step content */}
+          {renderStepContent()}
         </Paper>
-      </Stack>
-    </form>
+      </form>
+    </Stack>
   );
 }
