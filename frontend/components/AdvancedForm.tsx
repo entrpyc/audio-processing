@@ -46,7 +46,6 @@ export default function AdvancedForm() {
   const [appState, setAppState] = useState(APP_STATES.INIT);
   const [appErrorState, setAppErrorState] = useState<boolean>(false);
 
-  // Stepper index: 0..4 (4 = Submit/Review)
   const [active, setActive] = useState(0);
 
   const fieldRefs = {
@@ -114,7 +113,6 @@ export default function AdvancedForm() {
   const prev = () => setActive((s) => Math.max(s - 1, 0));
 
   const handleSubmit = async () => {
-    // Validate all steps before submit
     for (let s = 0; s <= 3; s++) {
       if (!validateStep(s)) {
         setActive(s);
@@ -202,7 +200,6 @@ export default function AdvancedForm() {
     notifications.show({ title: 'Status', message: status });
   }, [status]);
 
-  // --- Step content renderers (now separate from Stepper UI) ---
   const StepSource = (
     <Stack gap={30} ref={fieldRefs.audioFile}>
       <SegmentedControl
@@ -457,42 +454,40 @@ export default function AdvancedForm() {
   };
 
   const renderTopActions = () => {
-    // Actions bar lives at the TOP of the form Paper
-    if (appState === APP_STATES.STARTED) {
-      return (
-        <Group justify="space-between">
-          <div />
-          <Loader size="sm" />
-        </Group>
-      );
-    }
+    if(appState === APP_STATES.COMPLETED) return null;
 
     return (
-      <Group justify="space-between">
-        <Button variant="light" onClick={prev} disabled={active === 0 || appState !== APP_STATES.INIT}>
-          Back
-        </Button>
+      <Flex direction="column">
+        <Group justify="space-between">
+          {active > 0 ? (
+            <Button variant="light" onClick={prev} disabled={active === 0 || appState !== APP_STATES.INIT}>
+              Back
+            </Button>
+          ) : (
+            <div />
+          )}
+          
+          {active < 4 ? (
+            <Button onClick={next}>
+              Next
+            </Button>
+          ) : (
+            <div />
+          )}
+        </Group>
 
-        {active < 4 ? (
-          <Button onClick={next} disabled={appState !== APP_STATES.INIT}>
-            Next
-          </Button>
-        ) : (
-          <div />
-        )}
-      </Group>
+        <Divider my="md" />
+      </Flex>
     );
   };
 
   return (
     <Stack gap={30}>
-      {/* 1) NAVIGATION ONLY — separate Paper above the form */}
       <Paper shadow="md" withBorder p={20}>
         <Stepper
           active={active}
           onStepClick={(i) => i <= active && setActive(i)}
           size="sm"
-          allowNextStepsSelect={false}
         >
           <Stepper.Step label="Source" description="Cloud or upload" />
           <Stepper.Step label="Info" description="Title & date" />
@@ -502,7 +497,6 @@ export default function AdvancedForm() {
         </Stepper>
       </Paper>
 
-      {/* 2) FORM — buttons are on TOP inside this Paper */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -513,7 +507,6 @@ export default function AdvancedForm() {
         <Paper shadow="md" withBorder p={20}>
           {/* Top action bar */}
           {renderTopActions()}
-          <Divider my="md" />
 
           {/* Step content */}
           {renderStepContent()}
