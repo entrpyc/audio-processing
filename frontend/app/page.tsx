@@ -24,14 +24,14 @@ export default function Home() {
   return (
     <AppShell
       padding="xl"
-      navbar={{
-        width: 320,
-        breakpoint: 'sm',
-      }}
+      // navbar={{
+      //   width: 320,
+      //   breakpoint: 'sm',
+      // }}
     >      
-      <AppShell.Navbar>
+      {/* <AppShell.Navbar>
         <Navbar />
-      </AppShell.Navbar>
+      </AppShell.Navbar> */}
       
       <AppShell.Main>
         <Container size="xl">
