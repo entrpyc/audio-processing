@@ -169,7 +169,7 @@ export default function AdvancedForm() {
 
       if (output === 'download') {
         setStatus(`📥 Converted successfully. Downloading....`);
-        await downloadFile(res as Blob, formatTitle(selectedDate, form.getValues().title));
+        await downloadFile(res, formatTitle(selectedDate, form.getValues().title));
         setStatus(`✅ Downloaded successfully!`);
         setAppState(APP_STATES.COMPLETED);
         return;
