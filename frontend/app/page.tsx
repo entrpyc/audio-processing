@@ -2,7 +2,7 @@
 
 import { AppShell, useMantineTheme } from '@mantine/core';
 import { useEffect } from 'react';
-import AdvancedForm from '@/components/AdvancedForm';
+import AudioSubmission from '@/components/AudioSubmission';
 import { useZoomData } from '@/hooks/useZoomData';
 import { Navbar } from '@/components/Navbar';
 import { useMediaQuery } from '@mantine/hooks';
@@ -38,7 +38,7 @@ export default function Home() {
       )}
 
       <AppShell.Main pb={{ base: 80, sm: 'xl' }}>
-        <AdvancedForm />
+        <AudioSubmission />
       </AppShell.Main>
 
       {!isDesktop && (

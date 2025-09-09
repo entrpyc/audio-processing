@@ -18,6 +18,7 @@ import {
   Text,
   TextInput,
   Title,
+  useMantineTheme,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
@@ -31,9 +32,15 @@ import { handleFileUpload, handleZoomRecordingUpload } from '@/utils/requests';
 import { useZoomData } from '@/hooks/useZoomData';
 import { useAudioSubmission } from '@/hooks/useAudioSubmission';
 
+import classes from '@/styles/AudioSubmission.module.css';
+import { IconAdjustmentsAlt, IconCheck, IconCloudUpload, IconInfoCircle, IconSend } from '@tabler/icons-react';
+import { useMediaQuery } from '@mantine/hooks';
+
 export default function AdvancedForm() {
   const { zoomToken, recordings } = useZoomData();
   const { selectedGroup, handleSelectGroup } = useAudioSubmission();
+  const theme = useMantineTheme();
+  const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`);
 
   const [status, setStatus] = useState('');
   const [source, setSource] = useState<'zoom-cloud' | 'upload'>('zoom-cloud');
@@ -205,13 +212,13 @@ export default function AdvancedForm() {
       <SegmentedControl
         disabled={appState !== APP_STATES.INIT}
         fullWidth
-        size="md"
         value={source}
         onChange={(val) => setSource(val as 'zoom-cloud' | 'upload')}
         data={[
           { label: '☁︎ Zoom Cloud', value: 'zoom-cloud' },
           { label: '📁 Upload', value: 'upload' },
         ]}
+        classNames={{ root: classes.segmentedRoot }}
       />
 
       {source === 'zoom-cloud' ? (
@@ -294,6 +301,7 @@ export default function AdvancedForm() {
           { label: 'Send to Telegram', value: 'telegram' },
           { label: 'Download', value: 'download' },
         ]}
+        classNames={{ root: classes.segmentedRoot }}
       />
       {output === 'telegram' ? (
         <Select
@@ -322,6 +330,7 @@ export default function AdvancedForm() {
           { label: 'No filters', value: 'no-filters' },
           { label: 'Use custom settings', value: 'custom' },
         ]}
+        classNames={{ root: classes.segmentedRoot }}
       />
 
       {filters === 'default' && <Text>The default audio filters will be applied.</Text>}
@@ -487,15 +496,40 @@ export default function AdvancedForm() {
         <Stepper
           active={active}
           onStepClick={(i) => i <= active && setActive(i)}
-          size="sm"
+          size={isMobile ? 'xs' : 'sm'}
+          classNames={{
+            stepBody: classes.stepBody,
+            separator: classes.separator
+          }}
         >
-          <Stepper.Step label="Source" description="Cloud or upload" />
-          <Stepper.Step label="Info" description="Title & date" />
-          <Stepper.Step label="Output" description="Destination" />
-          <Stepper.Step label="Filters" description="Audio settings" />
-          <Stepper.Step label="Submit" description="Review & send" />
+          <Stepper.Step
+            icon={<IconCloudUpload size={20} />}
+            label="Source"
+            description="Cloud or upload"
+          />
+          <Stepper.Step
+            icon={<IconInfoCircle size={20} />}
+            label="Info"
+            description="Title & date"
+          />
+          <Stepper.Step
+            icon={<IconSend size={20} />}
+            label="Output"
+            description="Destination"
+          />
+          <Stepper.Step
+            icon={<IconAdjustmentsAlt size={20} />}
+            label="Filters"
+            description="Audio settings"
+          />
+          <Stepper.Step
+            icon={<IconCheck size={20} />}
+            label="Submit"
+            description="Review & send"
+          />
         </Stepper>
       </Paper>
+
 
       <form
         onSubmit={(e) => {

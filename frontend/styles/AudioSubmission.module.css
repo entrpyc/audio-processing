@@ -1,0 +1,27 @@
+.segmentedRoot {
+  display: flex;
+  flex-direction: row;
+}
+
+@media (max-width: 640px) {
+  .segmentedRoot {
+    flex-direction: column;
+    gap: var(--mantine-spacing-sm);
+
+    & ::before {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 1200px) {
+  .stepBody {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .separator {
+    margin-inline: auto;
+  }
+}
