@@ -1,15 +1,14 @@
 'use client'
 
-import { AppShell, useMantineTheme } from '@mantine/core';
+import { AppShell } from '@mantine/core';
 import { useEffect } from 'react';
 import AudioSubmission from '@/components/AudioSubmission';
 import { useZoomData } from '@/hooks/useZoomData';
 import { Navbar } from '@/components/Navbar';
-import { useMediaQuery } from '@mantine/hooks';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function Home() {
-  const theme = useMantineTheme();
-  const isDesktop = useMediaQuery(`(min-width: ${theme.breakpoints.sm})`);
+  const { isDesktop } = useTheme();
 
   const {
     handleFetchZoomRecordings,

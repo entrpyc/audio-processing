@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useContext, useState } from "react";
 import { ZoomRecording } from "../types/types";
 
 type ZoomDataContextValue = {
@@ -10,22 +10,19 @@ type ZoomDataContextValue = {
   setZoomToken: Dispatch<SetStateAction<string>>;
 }
 
-const defaultValues = {
-  recordings: [],
-  setRecordings: () => {},
-  zoomToken: '',
-  setZoomToken: () => {},
+export const ZoomDataContext = createContext<ZoomDataContextValue | undefined>(undefined);
+
+export const useZoomDataContext = (): ZoomDataContextValue => {
+  const ctx = useContext(ZoomDataContext);
+
+  if (!ctx) throw new Error('useZoomDataContext must be used within <ZoomDataProvider>');
+
+  return ctx;
 }
 
-export const ZoomDataContext = createContext<ZoomDataContextValue>(defaultValues);
-
 export function ZoomDataProvider({ children }: { children: React.ReactNode }) {
-  const [recordings, setRecordings] = useState<ZoomRecording[]>(defaultValues.recordings);
-  const [zoomToken, setZoomToken] = useState<string>(defaultValues.zoomToken);
-
-  useEffect(() => {
-    console.log(recordings)
-  }, [recordings])
+  const [recordings, setRecordings] = useState<ZoomRecording[]>([]);
+  const [zoomToken, setZoomToken] = useState('');
 
   return (
     <ZoomDataContext.Provider value={{

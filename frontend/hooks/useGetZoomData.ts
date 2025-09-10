@@ -1,8 +1,7 @@
-import { useContext } from "react"
-import { ZoomDataContext } from "../contexts/ZoomDataContext";
+import { useZoomDataContext } from "../contexts/ZoomDataContext";
 
 export const useGetZoomData = () => {
-  const { recordings, zoomToken } = useContext(ZoomDataContext);
+  const { recordings, zoomToken } = useZoomDataContext();
 
   return {
     recordings,

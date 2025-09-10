@@ -15,10 +15,10 @@ export const TELEGRAM_GROUPS = [
   TELEGRAM_RECORDINGS_GROUP,
 ]
 
-export const APP_STATES = {
-  INIT: 'init',
-  STARTED: 'started',
-  COMPLETED: 'completed',
+export enum SUBMISSION_STATES {
+  INIT = 'init',
+  STARTED = 'started',
+  COMPLETED = 'completed',
 }
 
 export const BITRATE_OPTIONS = [
@@ -40,3 +40,23 @@ export const FREQUENCY_OPTIONS = [
   { value: 75, label: '32000' },
   { value: 100, label: '44100' },
 ];
+
+export enum SOURCE_TYPES {
+  ZOOM_CLOUD = 'zoom-cloud',
+  UPLOAD = 'upload',
+}
+
+export enum OUTPUT_TYPES {
+  TELEGRAM = 'telegram',
+  DOWNLOAD = 'download',
+}
+
+export enum AUDIO_FILTERS_TYPES {
+  DEFAULT = 'default',
+  NO_FILTERS = 'no-filters',
+  CUSTOM = 'custom',
+}
+
+export const defaultVolumeBoost = 1.5;
+export const defaultBitrate = 37.5;
+export const defaultFrequency = 100;

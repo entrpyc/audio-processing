@@ -1,5 +1,5 @@
 import { useContext } from "react"
-import { ZoomDataContext } from "../contexts/ZoomDataContext"
+import { useZoomDataContext, ZoomDataContext } from "../contexts/ZoomDataContext"
 import { ZoomRecording } from "../types/types";
 import { getStorage, setStorage, STORAGE_KEYS } from "../utils/storage";
 import { fetchRecordings } from "../utils/zoomRecordings";
@@ -9,7 +9,7 @@ import { fetchToken } from "../utils/zoomToken";
 
 export const useHandleZoomData = () => {
   const { zoomToken } = useGetZoomData();
-  const { setRecordings, setZoomToken } = useContext(ZoomDataContext);
+  const { setRecordings, setZoomToken } = useZoomDataContext();
 
   const handleFetchZoomRecordings = async () => {
     if(!zoomToken) return;
