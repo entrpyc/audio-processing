@@ -2,10 +2,10 @@
 
 import { AppShell } from '@mantine/core';
 import { useEffect } from 'react';
-import AudioSubmission from '@/components/AudioSubmission';
 import { useZoomData } from '@/hooks/useZoomData';
 import { Navbar } from '@/components/Navbar';
 import { useTheme } from '@/hooks/useTheme';
+import AudioSubmissionForm from '@/components/AudioSubmissionForm/AudioSubmissionForm';
 
 export default function Home() {
   const { isDesktop } = useTheme();
@@ -37,7 +37,7 @@ export default function Home() {
       )}
 
       <AppShell.Main pb={{ base: 80, sm: 'xl' }}>
-        <AudioSubmission />
+        <AudioSubmissionForm />
       </AppShell.Main>
 
       {!isDesktop && (
