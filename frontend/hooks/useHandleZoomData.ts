@@ -1,9 +1,8 @@
-import { useContext } from "react"
-import { useZoomDataContext, ZoomDataContext } from "../contexts/ZoomDataContext"
+import { useZoomDataContext } from "../contexts/ZoomDataContext"
 import { ZoomRecording } from "../types/types";
 import { getStorage, setStorage, STORAGE_KEYS } from "../utils/storage";
 import { fetchRecordings } from "../utils/zoomRecordings";
-import { currentMonthRange, previousMonthRange } from "../utils/helpers";
+import { currentMonthRange, fullRange, previousMonthRange } from "../utils/helpers";
 import { useGetZoomData } from "./useGetZoomData";
 import { fetchToken } from "../utils/zoomToken";
 
@@ -18,7 +17,7 @@ export const useHandleZoomData = () => {
 
     if(storedRecordings.length) return setRecordings(storedRecordings);
 
-    const recordingsRes = await fetchRecordings(zoomToken, currentMonthRange);
+    const recordingsRes = await fetchRecordings(zoomToken, fullRange);
     
     if(!recordingsRes) return;
 
