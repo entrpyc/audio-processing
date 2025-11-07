@@ -18,7 +18,7 @@ import { UserButton } from './UserButton';
 import { Group } from '@mantine/core';
 
 export const linksData = [
-  { link: '/', label: 'Cloud Recordings', icon: IconCloud },
+  { link: '/cloud-recordings', label: 'Cloud Recordings', icon: IconCloud },
   { link: '/clear-speech', label: 'Clear speech', icon: IconMicrophone2 },
   { link: 'https://transcribe.indepthwebsolutions.com/', label: 'Transcribe Audio', icon: IconTextScan2 },
   { link: '', label: 'Knowledge Hub (WIP)', icon: IconFileTextAi },
@@ -28,7 +28,7 @@ export const linksData = [
 ];
 
 export const mobileLinks = [
-  { link: '/', label: 'Cloud Recordings', icon: IconCloud },
+  { link: '/cloud-recordings', label: 'Cloud Recordings', icon: IconCloud },
   { link: '/clear-speech', label: 'Clear speech', icon: IconMicrophone2 },
   { link: 'https://transcribe.indepthwebsolutions.com/', label: 'Transcribe Audio', icon: IconTextScan2 },
   { link: '', label: 'User (WIP)', icon: IconUserCircle },

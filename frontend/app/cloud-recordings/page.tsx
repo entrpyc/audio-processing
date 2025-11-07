@@ -7,7 +7,7 @@ import Layout from '@/components/Layout';
 
 export default function Home() {
   const {
-    handleFetchFullRangeZoomRecordings,
+    handleFetchZoomRecordings,
     zoomToken,
     handleZoomToken,
   } = useZoomData();
@@ -17,10 +17,12 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    handleFetchFullRangeZoomRecordings();
+    handleFetchZoomRecordings();
   }, [zoomToken]);
 
   return (
-    <Layout />
+    <Layout>
+      <AudioSubmissionForm />
+    </Layout>
   );
 }

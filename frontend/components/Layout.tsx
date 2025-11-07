@@ -5,7 +5,7 @@ import { Navbar } from '@/components/Navbar';
 import { useTheme } from '@/hooks/useTheme';
 import { ReactNode } from 'react';
 
-export default function Layout({ children }: { children: ReactNode[] | ReactNode }) {
+export default function Layout({ children }: { children?: ReactNode[] | ReactNode }) {
   const { isDesktop } = useTheme();
 
   return (
