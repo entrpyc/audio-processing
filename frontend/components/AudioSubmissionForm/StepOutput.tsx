@@ -3,8 +3,18 @@ import { OUTPUT_TYPES, SUBMISSION_STATES, TELEGRAM_GROUPS } from "@/utils/config
 import { SegmentedControl, Select, Stack, Text, TextInput } from "@mantine/core";
 
 import audioSubmissionCss from '@/styles/AudioSubmission.module.css';
+import { useEffect } from "react";
 
-export default function StepOutput() {
+type OutputType = {
+  label: string,
+  value: OUTPUT_TYPES
+}
+
+type StepOutputProps = {
+  outputs?: OutputType[]
+}
+
+export default function StepOutput({ outputs }: StepOutputProps) {
   const {
     submissionState,
     form,
@@ -12,7 +22,11 @@ export default function StepOutput() {
     setOutput,
     selectedGroup,
     handleSelectGroup,
-  } = useAudioSubmission(); 
+  } = useAudioSubmission();
+
+  useEffect(() => {
+    if(outputs?.[0].value) setOutput(outputs[0].value)
+  }, [outputs])
   
   return (
     <Stack gap={20}>
@@ -20,7 +34,7 @@ export default function StepOutput() {
         disabled={submissionState !== SUBMISSION_STATES.INIT}
         value={output}
         onChange={(v) => setOutput(v as OUTPUT_TYPES)}
-        data={[
+        data={outputs || [
           { label: 'Send to Telegram', value: 'telegram' },
           { label: 'Download', value: 'download' },
         ]}

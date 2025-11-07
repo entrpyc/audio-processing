@@ -7,19 +7,19 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 
-import { SUBMISSION_STATES } from '@/utils/config';
+import { OUTPUT_TYPES, SOURCE_TYPES, SUBMISSION_STATES } from '@/utils/config';
 import { useAudioSubmission } from '@/hooks/useAudioSubmission';
 
-import StepSource from './StepSource';
-import StepInfo from './StepInfo';
-import StepOutput from './StepOutput';
-import StepFilters from './StepFilters';
-import StepSubmit from './StepSubmit';
+import StepSource from '../StepSource';
+import StepInfo from '../StepInfo';
+import StepOutput from '../StepOutput';
+import StepFilters from '../StepFilters';
+import StepSubmit from '../StepSubmit';
 import { useZoomData } from '@/hooks/useZoomData';
-import TopBarActions from './TopBarActions';
-import FormNavigation from './FormNavigation';
+import TopBarActions from '../TopBarActions';
+import FormNavigation from '../FormNavigation';
 
-export default function AudioSubmissionForm() {
+export default function ClearSpeechForm() {
   const { recordings } = useZoomData();
   const {
     activeStep,
@@ -49,7 +49,9 @@ export default function AudioSubmissionForm() {
           )}
 
           {activeStep === 0 && (
-            <StepSource />
+            <StepSource sources={[
+              { label: '📁 Upload', value: SOURCE_TYPES.UPLOAD },
+            ]} />
           )}
 
           {activeStep === 1 && (
@@ -57,7 +59,9 @@ export default function AudioSubmissionForm() {
           )}
 
           {activeStep === 2 && (
-            <StepOutput />
+            <StepOutput outputs={[
+              { label: 'Download', value: OUTPUT_TYPES.DOWNLOAD },
+            ]} />
           )}
 
           {activeStep === 3 && (

@@ -1,15 +1,11 @@
 'use client'
 
-import { AppShell } from '@mantine/core';
 import { useEffect } from 'react';
 import { useZoomData } from '@/hooks/useZoomData';
-import { Navbar } from '@/components/Navbar';
-import { useTheme } from '@/hooks/useTheme';
-import AudioSubmissionForm from '@/components/AudioSubmissionForm/AudioSubmissionForm';
+import AudioSubmissionForm from '@/components/AudioSubmissionForm/variants/AudioSubmissionForm';
+import Layout from '@/components/Layout';
 
 export default function Home() {
-  const { isDesktop } = useTheme();
-
   const {
     handleFetchFullRangeZoomRecordings,
     zoomToken,
@@ -25,26 +21,8 @@ export default function Home() {
   }, [zoomToken]);
 
   return (
-    <AppShell
-      padding={{ base: 'md', sm: 'xl' }}
-      navbar={{ width: 280, breakpoint: 'sm' }}
-      footer={!isDesktop ? { height: 64 } : undefined}
-    >
-      {isDesktop && (
-        <AppShell.Navbar>
-          <Navbar />
-        </AppShell.Navbar>
-      )}
-
-      <AppShell.Main pb={{ base: 80, sm: 'xl' }}>
-        <AudioSubmissionForm />
-      </AppShell.Main>
-
-      {!isDesktop && (
-        <AppShell.Footer p="xs" style={{ position: 'sticky', bottom: 0 }}>
-          <Navbar variant="mobile" />
-        </AppShell.Footer>
-      )}
-    </AppShell>
+    <Layout>
+      <AudioSubmissionForm />
+    </Layout>
   );
 }
