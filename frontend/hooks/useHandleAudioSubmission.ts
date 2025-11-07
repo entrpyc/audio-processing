@@ -93,12 +93,12 @@ export const useHandleAudioSubmission = () => {
         return;
       }
     }
-    if (!zoomToken) {
-      setStatus('❌ Upload failed: Missing Zoom token');
-      setSubmissionErrorState(true);
-      setSubmissionState(SUBMISSION_STATES.COMPLETED);
-      return;
-    }
+    // if (!zoomToken) {
+    //   setStatus('❌ Upload failed: Missing Zoom token');
+    //   setSubmissionErrorState(true);
+    //   setSubmissionState(SUBMISSION_STATES.COMPLETED);
+    //   return;
+    // }
     if (source === 'zoom-cloud' && !selectedRecording?.downloadUrl) {
       setStatus('❌ Upload failed: No download URL for the selected recording');
       setSubmissionErrorState(true);

@@ -64,7 +64,7 @@ export default function StepSubmit() {
 
       <Flex justify="center" align="center">
         {submissionState === SUBMISSION_STATES.INIT && (
-          <Button type="submit" fullWidth disabled={!zoomToken}>Submit</Button>
+          <Button type="submit" fullWidth>Submit</Button>
         )}
 
         {submissionState === SUBMISSION_STATES.STARTED && (

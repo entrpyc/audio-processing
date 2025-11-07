@@ -1,23 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import {
-  IconFolder,
-  IconUpload,
   IconSettings,
   IconFileTextAi,
   IconAdjustmentsAlt,
   IconLogout,
   IconUsers,
   IconUserCircle,
+  IconMicrophone2,
+  IconCloud,
+  IconTextScan2,
 } from '@tabler/icons-react';
 import classes from '@/styles/Navbar.module.css';
 import { UserButton } from './UserButton';
 import { Group } from '@mantine/core';
 
 export const linksData = [
-  { link: '', label: 'New Submission', icon: IconUpload },
-  { link: '', label: 'Recordings (WIP)', icon: IconFolder },
+  { link: '/', label: 'Cloud Recordings', icon: IconCloud },
+  { link: '/clear-speech', label: 'Clear speech', icon: IconMicrophone2 },
+  { link: 'https://transcribe.indepthwebsolutions.com/', label: 'Transcribe Audio', icon: IconTextScan2 },
   { link: '', label: 'Knowledge Hub (WIP)', icon: IconFileTextAi },
   { link: '', label: 'Features (WIP)', icon: IconAdjustmentsAlt },
   { link: '', label: 'Members (WIP)', icon: IconUsers },
@@ -25,9 +28,9 @@ export const linksData = [
 ];
 
 export const mobileLinks = [
-  { link: '', label: 'New Submission', icon: IconUpload },
-  { link: '', label: 'Recordings (WIP)', icon: IconFolder },
-  { link: '', label: 'Knowledge Hub (WIP)', icon: IconFileTextAi },
+  { link: '/', label: 'Cloud Recordings', icon: IconCloud },
+  { link: '/clear-speech', label: 'Clear speech', icon: IconMicrophone2 },
+  { link: 'https://transcribe.indepthwebsolutions.com/', label: 'Transcribe Audio', icon: IconTextScan2 },
   { link: '', label: 'User (WIP)', icon: IconUserCircle },
 ];
 
@@ -36,7 +39,22 @@ type NavbarProps = {
 };
 
 export function Navbar({ variant = 'desktop' }: NavbarProps) {
-  const [active, setActive] = useState(linksData[0].label);
+  const router = useRouter();
+  const pathname = usePathname();
+  const [active, setActive] = useState('');
+
+  // Automatically set active link based on current path
+  useEffect(() => {
+  const currentLinks = variant === 'desktop' ? linksData : mobileLinks;
+
+  // Match only exact internal routes (ignore external links)
+  const matched = currentLinks.find(
+    (l) => l.link && !l.link.startsWith('http') && l.link === pathname
+  );
+
+  if (matched) setActive(matched.label);
+  else setActive('');
+}, [pathname, variant]);
 
   const links = (variant === 'desktop' ? linksData : mobileLinks).map((item) => (
     <a
@@ -46,7 +64,17 @@ export function Navbar({ variant = 'desktop' }: NavbarProps) {
       key={item.label}
       onClick={(event) => {
         event.preventDefault();
+
+        if (!item.link) return; // do nothing for WIP links
         setActive(item.label);
+
+        if (item.link.startsWith('http')) {
+          // open external link in same tab
+          window.location.href = item.link;
+        } else {
+          // use Next.js router for internal navigation
+          router.push(item.link);
+        }
       }}
     >
       <item.icon className={classes.linkIcon} stroke={1.5} />

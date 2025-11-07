@@ -5,8 +5,18 @@ import { Card, FileInput, Flex, Loader, SegmentedControl, Stack, Text } from "@m
 
 import globalCss from '@/styles/global.module.css';
 import audioSubmissionCss from '@/styles/AudioSubmission.module.css';
+import { useEffect } from "react";
 
-export default function StepSource() {
+type SourceType = {
+  label: string,
+  value: SOURCE_TYPES
+}
+
+type StepSourceProps = {
+  sources?: SourceType[]
+}
+
+export default function StepSource({ sources }: StepSourceProps) {
   const { recordings } = useZoomData();
   const {
     fieldRefs,
@@ -16,7 +26,11 @@ export default function StepSource() {
     setSource,
     setSelectedRecording,
     form,
-  } = useAudioSubmission(); 
+  } = useAudioSubmission();
+
+  useEffect(() => {
+    if(sources?.[0].value) setSource(sources[0].value)
+  }, [sources])
   
   return (
     <Stack gap={30} ref={fieldRefs.audioFileRef}>
@@ -25,7 +39,7 @@ export default function StepSource() {
         fullWidth
         value={source}
         onChange={(val) => setSource(val as SOURCE_TYPES)}
-        data={[
+        data={sources || [
           { label: '☁︎ Zoom Cloud', value: 'zoom-cloud' },
           { label: '📁 Upload', value: 'upload' },
         ]}
