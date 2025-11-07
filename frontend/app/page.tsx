@@ -11,7 +11,7 @@ export default function Home() {
   const { isDesktop } = useTheme();
 
   const {
-    handleFetchZoomRecordings,
+    handleFetchFullRangeZoomRecordings,
     zoomToken,
     handleZoomToken,
   } = useZoomData();
@@ -21,7 +21,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    handleFetchZoomRecordings();
+    handleFetchFullRangeZoomRecordings();
   }, [zoomToken]);
 
   return (

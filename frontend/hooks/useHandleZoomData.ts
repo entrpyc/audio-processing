@@ -17,7 +17,7 @@ export const useHandleZoomData = () => {
 
     if(storedRecordings.length) return setRecordings(storedRecordings);
 
-    const recordingsRes = await fetchRecordings(zoomToken, fullRange);
+    const recordingsRes = await fetchRecordings(zoomToken, currentMonthRange);
     
     if(!recordingsRes) return;
 
@@ -42,10 +42,26 @@ export const useHandleZoomData = () => {
     return true;
   }
 
+  const handleFetchFullRangeZoomRecordings = async () => {
+    if(!zoomToken) return;
+
+    const storedRecordings = getStorage(STORAGE_KEYS.ZOOM_RECORDINGS) ?? [];
+
+    if(storedRecordings.length) return setRecordings(storedRecordings);
+
+    const recordingsRes = await fetchRecordings(zoomToken, fullRange);
+    
+    if(!recordingsRes) return;
+
+    setRecordings(recordingsRes);
+    setStorage(STORAGE_KEYS.ZOOM_RECORDINGS, recordingsRes)
+  }
+
   return {
     handleFetchZoomRecordings,
     handleZoomToken,
     handleFetchOlderZoomRecordings,
+    handleFetchFullRangeZoomRecordings,
     setRecordings,
   }
 }

@@ -61,3 +61,4 @@ const previousMonthEnd   = new Date(now.getFullYear(), now.getMonth(), 0);
 
 export const currentMonthRange  = [formatDateRange(currentMonthStart), formatDateRange(currentMonthEnd)];
 export const previousMonthRange = [formatDateRange(previousMonthStart), formatDateRange(previousMonthEnd)];
+export const fullRange = [formatDateRange(previousMonthStart), formatDateRange(currentMonthEnd)];
