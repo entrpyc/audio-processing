@@ -2,7 +2,7 @@ import { useZoomDataContext } from "../contexts/ZoomDataContext"
 import { ZoomRecording } from "../types/types";
 import { getStorage, setStorage, STORAGE_KEYS } from "../utils/storage";
 import { fetchRecordings } from "../utils/zoomRecordings";
-import { currentMonthRange, fullRange, previousMonthRange } from "../utils/helpers";
+import { recordingsDateRange } from "../utils/helpers";
 import { useGetZoomData } from "./useGetZoomData";
 import { fetchToken } from "../utils/zoomToken";
 
@@ -17,7 +17,7 @@ export const useHandleZoomData = () => {
 
     if(storedRecordings.length) return setRecordings(storedRecordings);
 
-    const recordingsRes = await fetchRecordings(zoomToken, currentMonthRange);
+    const recordingsRes = await fetchRecordings(zoomToken, recordingsDateRange);
     
     if(!recordingsRes) return;
 
@@ -30,38 +30,9 @@ export const useHandleZoomData = () => {
     setZoomToken(tokenRes);
   }
 
-  const handleFetchOlderZoomRecordings = async () => {
-    if(!zoomToken) return false;
-
-    const recordingsRes = await fetchRecordings(zoomToken, previousMonthRange);
-
-    if(!recordingsRes) return false;
-    
-    setRecordings((rec: ZoomRecording[]) => [...rec, ...recordingsRes]);
-
-    return true;
-  }
-
-  const handleFetchFullRangeZoomRecordings = async () => {
-    if(!zoomToken) return;
-
-    const storedRecordings = getStorage(STORAGE_KEYS.ZOOM_RECORDINGS) ?? [];
-
-    if(storedRecordings.length) return setRecordings(storedRecordings);
-
-    const recordingsRes = await fetchRecordings(zoomToken, fullRange);
-    
-    if(!recordingsRes) return;
-
-    setRecordings(recordingsRes);
-    setStorage(STORAGE_KEYS.ZOOM_RECORDINGS, recordingsRes)
-  }
-
   return {
     handleFetchZoomRecordings,
     handleZoomToken,
-    handleFetchOlderZoomRecordings,
-    handleFetchFullRangeZoomRecordings,
     setRecordings,
   }
 }

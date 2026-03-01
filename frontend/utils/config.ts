@@ -60,3 +60,5 @@ export enum AUDIO_FILTERS_TYPES {
 export const defaultVolumeBoost = 1.5;
 export const defaultBitrate = 37.5;
 export const defaultFrequency = 100;
+
+export const cloudSearchDateLimit = parseInt(process.env.NEXT_PUBLIC_CLOUD_SEARCH_DATE_LIMIT || '0') || 40;

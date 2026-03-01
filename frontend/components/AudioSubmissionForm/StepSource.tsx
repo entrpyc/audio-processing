@@ -5,7 +5,7 @@ import { Card, FileInput, Flex, Loader, SegmentedControl, Stack, Text } from "@m
 
 import globalCss from '@/styles/global.module.css';
 import audioSubmissionCss from '@/styles/AudioSubmission.module.css';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type SourceType = {
   label: string,
@@ -28,10 +28,21 @@ export default function StepSource({ sources }: StepSourceProps) {
     form,
   } = useAudioSubmission();
 
+  const [noRecordings, setNoRecordings] = useState(false);
+
   useEffect(() => {
     if(sources?.[0].value) setSource(sources[0].value)
   }, [sources])
-  
+
+  useEffect(() => {
+    if (recordings.length) {
+      setNoRecordings(false);
+      return;
+    }
+    const timer = setTimeout(() => setNoRecordings(true), 5000);
+    return () => clearTimeout(timer);
+  }, [recordings.length]);
+
   return (
     <Stack gap={30} ref={fieldRefs.audioFileRef}>
       <SegmentedControl
@@ -49,7 +60,7 @@ export default function StepSource({ sources }: StepSourceProps) {
       {source === 'zoom-cloud' ? (
         !recordings.length ? (
           <Flex justify="center" align="center">
-            <Loader />
+            {noRecordings ? <Text c="dimmed">No recordings found</Text> : <Loader />}
           </Flex>
         ) : (
           <Stack gap={10}>

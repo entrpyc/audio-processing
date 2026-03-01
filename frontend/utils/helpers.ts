@@ -1,3 +1,5 @@
+import { cloudSearchDateLimit } from "./config";
+
 export const formatDate = (inputDate: string) => {
   const date = new Date(inputDate);
   const day = date.getDate();
@@ -53,12 +55,9 @@ const formatDateRange = (d: Date) => {
 
 const now = new Date();
 
-const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-const currentMonthEnd   = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+const recordingsRangeStart = new Date(now);
+const recordingsRangeEnd = new Date(now);
+recordingsRangeStart.setDate(now.getDate() - cloudSearchDateLimit);
+recordingsRangeEnd.setDate(now.getDate() + 1);
 
-const previousMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-const previousMonthEnd   = new Date(now.getFullYear(), now.getMonth(), 0);
-
-export const currentMonthRange  = [formatDateRange(currentMonthStart), formatDateRange(currentMonthEnd)];
-export const previousMonthRange = [formatDateRange(previousMonthStart), formatDateRange(previousMonthEnd)];
-export const fullRange = [formatDateRange(previousMonthStart), formatDateRange(currentMonthEnd)];
+export const recordingsDateRange = [formatDateRange(recordingsRangeStart), formatDateRange(recordingsRangeEnd)];

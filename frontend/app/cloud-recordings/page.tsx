@@ -17,6 +17,8 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (!zoomToken) return;
+
     handleFetchZoomRecordings();
   }, [zoomToken]);
 
